@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bilingual Conversation Starter</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&family=Inter:wght@300;400;600;700&display=swap');
+    :root{--bg:#faf9f6;--panel:#fff;--alt:#f1f5f9;--head:#0f172a;--text:#475569;--border:#e2e8f0;--accent:#1e3a8a;--grad:linear-gradient(135deg,#1e3a8a,#0f172a)}
+    [data-theme="1"]{--bg:#fff7ed;--alt:#ffedd5;--head:#431407;--text:#7c2d12;--border:#fed7aa;--accent:#ea580c;--grad:linear-gradient(135deg,#ea580c,#9a3412)}
+    [data-theme="2"]{--bg:#f0fdf4;--alt:#dcfce7;--head:#14532d;--text:#166534;--border:#bbf7d0;--accent:#16a34a;--grad:linear-gradient(135deg,#16a34a,#14532d)}
+    [data-theme="3"]{--bg:#0b0f19;--panel:#161f30;--alt:#1f2e45;--head:#f8fafc;--text:#94a3b8;--border:#2d3f58;--accent:#818cf8;--grad:linear-gradient(135deg,#6366f1,#312e81)}
+    body{font-family:Sarabun,Inter,sans-serif;background:var(--bg);color:var(--head);transition:.25s}.panel{background:var(--panel);border-color:var(--border)}.alt{background:var(--alt)}.muted{color:var(--text)}.accent{color:var(--accent)}.grad{background:var(--grad);color:#fff}.border-c{border-color:var(--border)}
+    @keyframes pop{from{opacity:0;transform:scale(.98) translateY(8px)}to{opacity:1;transform:none}}.pop{animation:pop .28s cubic-bezier(.16,1,.3,1)}
+    .category:checked+div{border-color:var(--accent);background:var(--alt);transform:scale(1.01)}.category:checked+div .tick{display:block}
+  </style>
+</head>
+<body id="app" data-theme="0" class="min-h-screen flex flex-col">
+  <header class="panel border-b sticky top-0 z-10 shadow-sm">
+    <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
+      <div class="flex items-center gap-2"><div class="grad w-9 h-9 rounded-xl grid place-items-center font-bold">BI</div><b>Bilingual Starter</b></div>
+      <div class="flex items-center gap-2">
+        <div class="alt border border-c rounded-xl p-1 text-xs font-bold">
+          <button id="l-th" onclick="setLang('th')" class="px-2 py-1 rounded-lg panel accent">TH</button><button id="l-en" onclick="setLang('en')" class="px-2 py-1 rounded-lg muted">EN</button><button id="l-bi" onclick="setLang('bi')" class="px-2 py-1 rounded-lg muted">BOTH</button>
+        </div>
+        <button onclick="toggleMusic()" id="music" class="panel border border-c rounded-xl w-10 h-10" title="ambient music">♪</button>
+        <button onclick="cycleTheme()" id="theme" class="panel border border-c rounded-xl px-3 py-2 text-xs font-bold muted">Pure</button>
+        <div class="hidden sm:block text-right border-l border-c pl-3"><div class="text-[10px] muted">ตอบแล้ว</div><b id="count" class="accent text-lg">0</b></div>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-5xl w-full mx-auto p-4 sm:p-6 flex-1 grid place-items-center">
+    <section id="setup" class="w-full pop">
+      <div class="panel border border-c rounded-3xl shadow-md p-5 sm:p-8">
+        <div class="text-center mb-6"><h1 class="text-2xl sm:text-3xl font-bold accent">เลือกหัวข้อบทสนทนา / Choose Categories</h1><p class="muted mt-2">เลือกหมวดคำถามเพื่อเริ่มกิจกรรมทำความรู้จัก ฝึกภาษา และแบ่งปันความเชื่อ</p></div>
+        <div id="cats" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+        <div class="mt-6 pt-5 border-t border-c flex flex-col sm:flex-row justify-between gap-3">
+          <div><button onclick="setAll(true)" class="px-3 py-2 text-sm muted font-bold">เลือกทั้งหมด</button><button onclick="setAll(false)" class="px-3 py-2 text-sm muted font-bold">เอาออกทั้งหมด</button></div>
+          <button onclick="start()" class="grad rounded-2xl px-8 py-3 font-bold shadow-md">เริ่มการสนทนา / Start Session</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="play" class="hidden w-full pop">
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex gap-2"><button onclick="toggleTimer()" class="panel border border-c rounded-xl px-4 py-2 font-mono font-bold"><span id="timerIcon">▶</span> <span id="timer">00:00</span></button><button onclick="resetTimer()" class="panel border border-c rounded-xl w-11">↻</button></div>
+        <button onclick="end()" class="panel border border-c rounded-xl px-4 py-2 text-sm font-bold muted">จบกิจกรรม / Exit</button>
+      </div>
+      <div id="card" class="panel border border-c rounded-3xl shadow-lg min-h-[340px] p-6 sm:p-10 text-center flex flex-col justify-between overflow-hidden relative">
+        <div class="absolute top-0 left-0 right-0 h-1.5 alt"><div id="bar" class="grad h-full w-0 transition-all"></div></div>
+        <div id="badge" class="mx-auto mt-2 text-xs font-bold rounded-full px-3 py-1.5 alt muted">Ready</div>
+        <div class="flex-1 grid place-items-center my-6"><div class="w-full"><h2 id="qth" class="accent text-xl sm:text-3xl font-semibold leading-relaxed"></h2><h3 id="qen" class="muted text-lg sm:text-2xl italic leading-relaxed border-t border-c mt-5 pt-5"></h3></div></div>
+        <div class="border-t border-c pt-5 flex justify-between gap-3"><button onclick="copyQ()" class="panel border border-c rounded-xl w-11">⧉</button><div class="flex gap-2"><button id="prev" onclick="prevQ()" class="panel border border-c rounded-xl px-4 py-2 font-bold disabled:opacity-40" disabled>ย้อนกลับ</button><button onclick="nextQ()" class="grad rounded-xl px-5 py-2 font-bold">ถัดไป / Next</button></div></div>
+      </div>
+      <div class="panel border border-c rounded-2xl mt-4 p-4"><button onclick="hist.classList.toggle('hidden')" class="w-full flex justify-between font-bold accent"><span>ประวัติ / History (<span id="hcount">0</span>)</span><span>⌄</span></button><div id="hist" class="hidden mt-3 max-h-48 overflow-auto divide-y border-c"></div></div>
+    </section>
+  </main>
+
+  <div id="toast" class="fixed bottom-5 right-5 bg-neutral-900 text-white rounded-xl px-4 py-2 text-sm shadow-lg translate-y-20 opacity-0 transition-all">Copied</div>
+
+<script>
+const categories=[['อุ่นเครื่อง','Warm Up','☕'],['ความทรงจำ','Memories','📷'],['ทัศนคติ','Attitudes','💡'],['สามัคคีธรรมและการรับใช้','Koinonia & Service','🤝'],['พระคัมภีร์และศาสนศาสตร์','Bible & Theology','📖'],['ชีวิตคริสตจักร','Church Life','⛪']];
+const questionDB=[
+{c:1,th:'ในสัปดาห์นี้ มีเรื่องอะไรที่ทำให้คุณรู้สึกยิ้มได้กว้างที่สุดบ้าง?',en:'What made you smile the widest this week?'},{c:1,th:'หากวันนี้คุณสามารถเดินทางวาร์ปไปพักผ่อนที่ไหนก็ได้ในโลก 1 ชั่วโมง คุณจะไปที่ใด?',en:'If you could teleport anywhere for one hour today, where would you go?'},{c:1,th:'อาหารมื้อที่ดีและน่าประทับใจที่สุดที่คุณได้ลิ้มลองในเดือนนี้คืออะไร?',en:'What was the most impressive meal you had this month?'},{c:1,th:'หากจำเป็นต้องเลือกกินอาหารเพียงเมนูเดียวไปตลอดชีวิต คุณจะเลือกอะไร?',en:'If you had to eat one meal forever, what would it be?'},{c:1,th:'กิจกรรมอะไรที่คุณชอบทำเพื่อผ่อนคลายความเครียดมากที่สุดในช่วงนี้?',en:'What activity helps you decompress these days?'},{c:1,th:'หากคุณพูดภาษาเพิ่มได้หนึ่งภาษาอย่างคล่องแคล่ว คุณจะเลือกภาษาใด?',en:'If you could speak one more language fluently, which would you choose?'},
+{c:2,th:'เหตุการณ์ในวัยเด็กช่วงใดที่คุณยังคงจำได้ชัดเจนและอบอุ่นใจที่สุด?',en:'Which childhood event do you remember most vividly and warmly?'},{c:2,th:'ใครคือครูหรือบุคคลต้นแบบที่เป็นแรงบันดาลใจสำคัญให้ชีวิตคุณ?',en:'Who was a teacher or role model who greatly inspired you?'},{c:2,th:'จุดเปลี่ยนครั้งสำคัญใดในชีวิตที่ทำให้คุณเติบโตขึ้น?',en:'What major turning point helped you grow?'},{c:2,th:'คำแนะนำที่ดีที่สุดที่คุณเคยได้รับจากผู้ใหญ่คืออะไร?',en:'What is the best advice you have received from an elder?'},{c:2,th:'บทเพลงใดที่ได้ยินแล้วนึกถึงความทรงจำช่วงวัยเรียน?',en:'Which song brings back memories of school days?'},{c:2,th:'ความสำเร็จหรือความล้มเหลวครั้งใดที่สอนบทเรียนล้ำค่าให้คุณ?',en:'Which success or failure taught you a valuable lesson?'},
+{c:3,th:'ในมุมมองของคุณ ความหมายของความสำเร็จที่แท้จริงคืออะไร?',en:'In your view, what is true success?'},{c:3,th:'คุณค่าที่สำคัญที่สุดที่คุณยึดถือในการดำเนินชีวิตคืออะไร?',en:'What core value do you live by?'},{c:3,th:'หากเปลี่ยนทัศนคติของสังคมได้หนึ่งข้อ คุณอยากเปลี่ยนเรื่องใด?',en:'If you could change one social attitude, what would it be?'},{c:3,th:'คุณจัดการกับความผิดหวังหรือความสูญเสียใหญ่อย่างไร?',en:'How do you cope with major disappointment or loss?'},{c:3,th:'ความแตกต่างระหว่างการใช้ชีวิตเพื่อความสุขและเพื่อความหมายคืออะไร?',en:'What is the difference between living for happiness and meaning?'},{c:3,th:'คุณนิยามผู้นำที่ดีไว้อย่างไร?',en:'How do you define a good leader?'},
+{c:4,th:'เราจะสนับสนุนและพยุงกำลังใจกันได้อย่างจริงจังอย่างไร?',en:'How can we practically support and uplift each other?'},{c:4,th:'จุดแข็งของชุมชนที่เราอยู่ร่วมกันคืออะไร?',en:'What are the strengths of our community?'},{c:4,th:'อุปสรรคสำคัญที่ทำให้คนในชุมชนเข้าใจกันยากคืออะไร?',en:'What is the main barrier to mutual understanding in a community?'},{c:4,th:'ชื่นชมของประทานหรือนิสัยของเพื่อนในวงสนทนานี้หนึ่งคน',en:'Praise a gift or trait of someone in this circle.'},{c:4,th:'คุณมีความสามารถใดที่อยากนำมารับใช้ชุมชนเพิ่มขึ้น?',en:'What skill would you like to use to serve the community?'},{c:4,th:'การต้อนรับเพื่อนใหม่อย่างอบอุ่นควรทำอย่างไร?',en:'How should we warmly welcome newcomers?'},
+{c:5,th:'พระคัมภีร์ข้อใดที่คุณยึดมั่นในการดำเนินชีวิตทางความเชื่อ?',en:'Which Scripture verse do you hold onto in your walk of faith?'},{c:5,th:'ตัวละครในพระคัมภีร์คนใดที่ชีวิตหรือการดิ้นรนใกล้เคียงกับคุณ?',en:'Which biblical character resonates most with your life or struggles?'},{c:5,th:'หากย้อนเวลาไปเห็นเหตุการณ์ในพระคัมภีร์ได้ คุณอยากเห็นเหตุการณ์ใด?',en:'Which biblical event would you want to witness firsthand?'},{c:5,th:'พระธรรมเล่มใดที่คุณชอบอ่านซ้ำและค้นคว้าบ่อยที่สุด เพราะอะไร?',en:'Which Bible book do you study most often, and why?'},{c:5,th:'คำอุปมาของพระเยซูเรื่องใดที่เข้าใจง่ายแต่ทรงพลังที่สุด?',en:'Which parable of Jesus feels simple yet powerful to you?'},{c:5,th:'พระธรรมตอนใดที่อยากศึกษาบริบทวัฒนธรรมและภาษาดั้งเดิมเพิ่มเติม?',en:'Which passage would you like to study in cultural and original-language context?'},
+{c:6,th:'ความประทับใจแรกเมื่อคุณก้าวเข้ามาในคริสตจักรคืออะไร?',en:'What was your first impression when you stepped into church?'},{c:6,th:'ส่วนใดของการนมัสการวันอาทิตย์ที่คุณเชื่อมโยงได้ดีที่สุด?',en:'Which part of Sunday worship connects with you most?'},{c:6,th:'บทเพลงนมัสการใดที่นำคุณซาบซึ้งในความรักของพระเจ้า?',en:'Which worship song moves you with God’s love?'},{c:6,th:'กิจกรรมสามัคคีธรรมแบบใดที่คุณรู้สึกผ่อนคลายและสร้างสรรค์ที่สุด?',en:'What fellowship activity feels most relaxing and creative?'},{c:6,th:'หากเริ่มพันธกิจใหม่ในคริสตจักรได้ คุณอยากเริ่มแนวใด?',en:'If you could launch a new church ministry, what would it be?'},{c:6,th:'ประสบการณ์รับใช้ครั้งแรกในคริสตจักรของคุณคืออะไร?',en:'What was your first experience serving in church?'}];
+let lang='th',pool=[],history=[],idx=-1,total=0,sec=0,timer=null,running=false,theme=0,music=false,synth=null,loop=null;
+cats.innerHTML=categories.map((x,i)=>`<label class="cursor-pointer"><input class="category sr-only" id="cat${i+1}" type="checkbox" checked><div class="panel border-2 border-c rounded-2xl p-4 h-full flex gap-3 transition-all"><div class="text-2xl">${x[2]}</div><div class="flex-1"><b class="accent">${x[0]} / ${x[1]}</b><p class="muted text-sm mt-1">คำถามสำหรับเปิดใจและแบ่งปันอย่างเป็นธรรมชาติ</p></div><b class="tick hidden accent">✓</b></div></label>`).join('');
+function setAll(v){for(let i=1;i<=6;i++)document.getElementById('cat'+i).checked=v}function setLang(l){lang=l;['th','en','bi'].forEach(x=>{let b=document.getElementById('l-'+x);b.className='px-2 py-1 rounded-lg '+(x==l?'panel accent':'muted')});if(idx>-1)show(history[idx])}
+function start(){let sel=[1,2,3,4,5,6].filter(i=>document.getElementById('cat'+i).checked);if(!sel.length)return alert('กรุณาเลือกหมวดหมู่อย่างน้อย 1 รายการ');pool=questionDB.filter(q=>sel.includes(q.c)).sort(()=>Math.random()-.5);history=[];idx=-1;total=pool.length;setup.classList.add('hidden');play.classList.remove('hidden');nextQ()}
+function end(){play.classList.add('hidden');setup.classList.remove('hidden');resetTimer()}function nextQ(){if(idx<history.length-1){idx++;return show(history[idx])}if(!pool.length)return alert('คำถามหมดแล้ว สามารถเริ่มรอบใหม่ได้');let q=pool.pop();history.push(q);idx=history.length-1;show(q);renderHist()}function prevQ(){if(idx>0){idx--;show(history[idx])}}
+function show(q){let cat=categories[q.c-1];badge.textContent=cat[0]+' / '+cat[1];qth.textContent=q.th;qen.textContent=q.en;qth.classList.toggle('hidden',lang==='en');qen.classList.toggle('hidden',lang==='th');card.classList.remove('pop');void card.offsetWidth;card.classList.add('pop');bar.style.width=(history.length/total*100)+'%';prev.disabled=idx<=0;count.textContent=hcount.textContent=history.length;resetTimer();toggleTimer()}
+function renderHist(){hist.innerHTML=history.slice().reverse().map(q=>`<div class="py-2 text-sm"><b class="accent">${categories[q.c-1][0]}</b><p>${q.th}</p><p class="muted italic">${q.en}</p></div>`).join('')}function copyQ(){let q=history[idx];if(!q)return;let t=lang==='th'?q.th:lang==='en'?q.en:q.th+'\n'+q.en;navigator.clipboard?.writeText(t).then(()=>toastMsg('คัดลอกแล้ว / Copied'))}
+function toastMsg(t){toast.textContent=t;toast.classList.remove('translate-y-20','opacity-0');setTimeout(()=>toast.classList.add('translate-y-20','opacity-0'),1800)}function fmt(s){return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')}function toggleTimer(){if(running){clearInterval(timer);running=false;timerIcon.textContent='▶'}else{running=true;timerIcon.textContent='Ⅱ';timer=setInterval(()=>{sec++;document.getElementById('timer').textContent=fmt(sec)},1000)}}function resetTimer(){clearInterval(timer);running=false;sec=0;document.getElementById('timer').textContent='00:00';timerIcon.textContent='▶'}
+function cycleTheme(){theme=(theme+1)%4;app.dataset.theme=theme;document.getElementById('theme').textContent=['Pure','Warm','Friendly','Deep'][theme];if(music)playMusic()}async function toggleMusic(){if(!music){await Tone.start();music=true;document.getElementById('music').classList.add('alt');playMusic()}else{music=false;document.getElementById('music').classList.remove('alt');if(loop)loop.stop();if(synth)synth.releaseAll()}}function playMusic(){if(!synth){synth=new Tone.PolySynth(Tone.Synth,{oscillator:{type:'sine'},envelope:{attack:3,release:5}}).chain(new Tone.Filter(420,'lowpass'),new Tone.Reverb({decay:8,wet:.65}),new Tone.Volume(-22),Tone.Destination);Tone.Transport.bpm.value=60;Tone.Transport.start()}if(loop){loop.stop();loop.dispose()}let sets=[[['C3','G3','B3','D4'],['F3','C4','E4','A4']],[['D3','A3','C#4','E4'],['G3','D4','F#4','B4']],[['F3','A3','C4','G4'],['G3','B3','D4','A4']],[['A2','E3','G3','C4'],['E2','B2','D3','G3']]][theme];let i=0;loop=new Tone.Loop(t=>{synth.triggerAttackRelease(sets[i++%sets.length],'3m',t,.45)},'4m').start(0)}
+</script>
+</body>
+</html>
