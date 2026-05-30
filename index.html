@@ -70,6 +70,20 @@
       --alt-bg: rgba(30, 41, 59, 0.6);
     }
 
+    [data-theme="4"] { /* Fun - Vibrant Rose/Sunny Yellow Spark */
+      --bg-gradient: linear-gradient(135deg, #fdf2f8 0%, #fef2f2 50%, #fffbeb 100%);
+      --panel-bg: rgba(255, 255, 255, 0.45);
+      --panel-border: rgba(255, 255, 255, 0.65);
+      --border-c: rgba(251, 207, 232, 0.7);
+      --head: #86198f;
+      --text: #be185d;
+      --accent: #db2777;
+      --accent-rgb: 219, 39, 119;
+      --grad: linear-gradient(135deg, #ec4899, #db2777);
+      --shadow: 0 8px 32px 0 rgba(219, 39, 119, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+      --alt-bg: rgba(253, 224, 241, 0.6);
+    }
+
     body {
       font-family: 'Sarabun', 'Outfit', sans-serif;
       background: var(--bg-gradient);
@@ -827,13 +841,13 @@
       timerIcon.textContent = '▶';
     }
 
-    // Toggle Themes (Pure, Warm, Friendly, Deep)
+    // Toggle Themes (Pure, Warm, Friendly, Deep, Fun)
     function cycleTheme() {
-      theme = (theme + 1) % 4;
+      theme = (theme + 1) % 5;
       app.dataset.theme = theme;
       
       const themeBtn = document.getElementById('theme');
-      const themeNames = ['Pure', 'Warm', 'Friendly', 'Deep'];
+      const themeNames = ['Pure', 'Warm', 'Friendly', 'Deep', 'Fun'];
       themeBtn.textContent = themeNames[theme];
       
       if (theme === 3) {
@@ -903,7 +917,8 @@
         { osc: 'sine', freq: 460, attack: 4, release: 6, chords: [[['C3', 'G3', 'B3', 'D4'], ['F3', 'C4', 'E4', 'A4'], ['A2', 'E3', 'G3', 'C4'], ['G2', 'D3', 'F3', 'B3']]], tempo: '4m' },
         { osc: 'triangle', freq: 340, attack: 3, release: 5, chords: [[['D3', 'A3', 'C#4', 'E4'], ['G3', 'D4', 'F#4', 'B4'], ['B2', 'F#3', 'A3', 'D4'], ['A2', 'E3', 'G3', 'C#4']]], tempo: '4m' },
         { osc: 'triangle', freq: 540, attack: 2, release: 4, chords: [[['F3', 'A3', 'C4', 'G4'], ['G3', 'B3', 'D4', 'A4'], ['E3', 'G3', 'B3', 'D4'], ['A2', 'C3', 'E3', 'G3']]], tempo: '2m' },
-        { osc: 'sine', freq: 260, attack: 6, release: 8, chords: [[['A2', 'E3', 'G3', 'C4'], ['E2', 'B2', 'D3', 'G3'], ['D2', 'A2', 'C3', 'F3'], ['F2', 'C3', 'E3', 'B3']]], tempo: '4m' }
+        { osc: 'sine', freq: 260, attack: 6, release: 8, chords: [[['A2', 'E3', 'G3', 'C4'], ['E2', 'B2', 'D3', 'G3'], ['D2', 'A2', 'C3', 'F3'], ['F2', 'C3', 'E3', 'B3']]], tempo: '4m' },
+        { osc: 'sine', freq: 620, attack: 1.5, release: 3.5, chords: [[['F3', 'A3', 'C4', 'E4'], ['G3', 'B3', 'D4', 'F4'], ['E3', 'G3', 'B3', 'D4'], ['A2', 'C3', 'E3', 'G3']]], tempo: '2m' }
       ][theme];
       
       filterNode.frequency.rampTo(profiles.freq, 0.4);
@@ -912,7 +927,7 @@
         envelope: { attack: profiles.attack, decay: 1, sustain: 0.85, release: profiles.release }
       }).chain(filterNode, reverbNode, volumeNode);
       
-      Tone.Transport.bpm.value = theme === 2 ? 72 : 60;
+      Tone.Transport.bpm.value = theme === 4 ? 80 : theme === 2 ? 72 : 60;
       Tone.Transport.start();
       
       let sets = profiles.chords[0], i = 0;
