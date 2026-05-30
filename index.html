@@ -3,85 +3,958 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Conversation Starter</title>
+  <title>Conversation Starter - กระชับมิตรและกระตุ้นการสนทนา</title>
+  <meta name="description" content="กิจกรรมบอร์ดเกมคำถามเปิดใจ กระชับความสัมพันธ์ ฝึกภาษา และแบ่งปันมุมมองความคิดความเชื่ออย่างลึกซึ้งและสร้างสรรค์" />
+  
+  <!-- CDNs for Tailwind CSS, Tone.js, and Canvas-Confetti -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&family=Inter:wght@300;400;600;700&display=swap');
-    :root{--bg:#faf9f6;--panel:#fff;--alt:#f1f5f9;--head:#0f172a;--text:#475569;--border:#e2e8f0;--accent:#1e3a8a;--grad:linear-gradient(135deg,#1e3a8a,#0f172a)}
-    [data-theme="1"]{--bg:#fff7ed;--alt:#ffedd5;--head:#431407;--text:#7c2d12;--border:#fed7aa;--accent:#ea580c;--grad:linear-gradient(135deg,#ea580c,#9a3412)}
-    [data-theme="2"]{--bg:#f0fdf4;--alt:#dcfce7;--head:#14532d;--text:#166534;--border:#bbf7d0;--accent:#16a34a;--grad:linear-gradient(135deg,#16a34a,#14532d)}
-    [data-theme="3"]{--bg:#0b0f19;--panel:#161f30;--alt:#1f2e45;--head:#f8fafc;--text:#94a3b8;--border:#2d3f58;--accent:#818cf8;--grad:linear-gradient(135deg,#6366f1,#312e81)}
-    body{font-family:Sarabun,Inter,sans-serif;background:var(--bg);color:var(--head);transition:.25s}.panel{background:var(--panel);border-color:var(--border)}.alt{background:var(--alt)}.muted{color:var(--text)}.accent{color:var(--accent)}.grad{background:var(--grad);color:#fff}.border-c{border-color:var(--border)}
-    @keyframes pop{from{opacity:0;transform:scale(.98) translateY(8px)}to{opacity:1;transform:none}}.pop{animation:pop .28s cubic-bezier(.16,1,.3,1)}
-    .category:checked+div{border-color:var(--accent);background:var(--alt);transform:scale(1.01)}.category:checked+div .tick{display:block}
+    @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap');
+
+    :root {
+      --bg-gradient: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+      --panel-bg: rgba(255, 255, 255, 0.45);
+      --panel-border: rgba(255, 255, 255, 0.6);
+      --border-c: rgba(226, 232, 240, 0.8);
+      --head: #0f172a;
+      --text: #475569;
+      --accent: #4f46e5;
+      --accent-rgb: 79, 70, 229;
+      --grad: linear-gradient(135deg, #6366f1, #4f46e5);
+      --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+      --alt-bg: rgba(241, 245, 249, 0.6);
+    }
+
+    [data-theme="1"] { /* Warm - Orange/Sunset */
+      --bg-gradient: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
+      --panel-bg: rgba(255, 255, 255, 0.4);
+      --panel-border: rgba(255, 255, 255, 0.7);
+      --border-c: rgba(254, 215, 170, 0.8);
+      --head: #431407;
+      --text: #7c2d12;
+      --accent: #ea580c;
+      --accent-rgb: 234, 88, 12;
+      --grad: linear-gradient(135deg, #f97316, #ea580c);
+      --shadow: 0 8px 32px 0 rgba(154, 52, 18, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+      --alt-bg: rgba(254, 243, 199, 0.6);
+    }
+
+    [data-theme="2"] { /* Friendly - Emerald/Mint */
+      --bg-gradient: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+      --panel-bg: rgba(255, 255, 255, 0.45);
+      --panel-border: rgba(255, 255, 255, 0.6);
+      --border-c: rgba(187, 247, 208, 0.7);
+      --head: #14532d;
+      --text: #166534;
+      --accent: #16a34a;
+      --accent-rgb: 22, 163, 74;
+      --grad: linear-gradient(135deg, #34d399, #10b981);
+      --shadow: 0 8px 32px 0 rgba(20, 83, 45, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+      --alt-bg: rgba(220, 252, 231, 0.5);
+    }
+
+    [data-theme="3"] { /* Deep - Dark Mode Cyber Purple */
+      --bg-gradient: linear-gradient(135deg, #090d16 0%, #020617 100%);
+      --panel-bg: rgba(15, 23, 42, 0.55);
+      --panel-border: rgba(255, 255, 255, 0.08);
+      --border-c: rgba(51, 65, 85, 0.6);
+      --head: #f8fafc;
+      --text: #94a3b8;
+      --accent: #818cf8;
+      --accent-rgb: 129, 140, 248;
+      --grad: linear-gradient(135deg, #818cf8, #4f46e5);
+      --shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      --alt-bg: rgba(30, 41, 59, 0.6);
+    }
+
+    body {
+      font-family: 'Sarabun', 'Outfit', sans-serif;
+      background: var(--bg-gradient);
+      color: var(--head);
+      transition: background 0.4s cubic-bezier(0.4, 0, 0.2, 1), color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Glassmorphism Styles */
+    .glass-panel {
+      background: var(--panel-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--panel-border);
+      box-shadow: var(--shadow);
+    }
+
+    .glass-btn {
+      background: var(--panel-bg);
+      border: 1px solid var(--border-c);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .glass-btn:hover {
+      background: var(--alt-bg);
+      transform: translateY(-2px);
+      border-color: var(--accent);
+      box-shadow: 0 4px 12px rgba(var(--accent-rgb), 0.15);
+    }
+    .glass-btn:active {
+      transform: translateY(1px);
+    }
+
+    .theme-head { color: var(--head) !important; }
+    .theme-text { color: var(--text) !important; }
+    .theme-accent { color: var(--accent) !important; }
+
+    /* 3D Card Flip styling */
+    .card-perspective {
+      perspective: 1200px;
+    }
+    .card-3d {
+      transform-style: preserve-3d;
+      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .card-flip-y {
+      transform: rotateY(90deg) scale(0.95);
+      opacity: 0.5;
+    }
+
+    /* Active styling for selected categories */
+    .category:checked + div {
+      border-color: var(--accent);
+      background: var(--alt-bg);
+      transform: scale(1.02);
+      box-shadow: 0 10px 20px rgba(var(--accent-rgb), 0.12);
+    }
+    .category:checked + div .tick {
+      display: flex;
+    }
+
+    /* Custom Scrollbar for elegant feel */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--border-c);
+      border-radius: 99px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--accent);
+    }
+
+    @keyframes pop {
+      from { opacity: 0; transform: scale(0.97) translateY(12px); }
+      to { opacity: 1; transform: none; }
+    }
+    .pop {
+      animation: pop 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
   </style>
 </head>
-<body id="app" data-theme="0" class="min-h-screen flex flex-col">
-  <header class="panel border-b sticky top-0 z-10 shadow-sm">
-    <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
-      <div class="flex items-center gap-2"><div class="grad w-9 h-9 rounded-xl grid place-items-center font-bold">CS</div><b>Conversation Starter</b></div>
-      <div class="flex items-center gap-2">
-        <div class="alt border border-c rounded-xl p-1 text-xs font-bold">
-          <button id="l-th" onclick="setLang('th')" class="px-2 py-1 rounded-lg panel accent">TH</button><button id="l-en" onclick="setLang('en')" class="px-2 py-1 rounded-lg muted">EN</button><button id="l-bi" onclick="setLang('bi')" class="px-2 py-1 rounded-lg muted">BOTH</button>
+<body id="app" data-theme="0" class="min-h-screen flex flex-col antialiased">
+
+  <!-- Header Section -->
+  <header class="glass-panel border-b sticky top-0 z-40 shadow-sm transition-all duration-300">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-indigo-600 to-indigo-800 text-white font-bold flex items-center justify-center shadow-lg transition-transform duration-300 hover:rotate-12">
+          CS
         </div>
-        <div class="panel border border-c rounded-xl px-2 py-1 flex items-center gap-2">
-          <button onclick="toggleMusic()" id="music" class="rounded-lg w-8 h-8 font-bold" title="เปิด/ปิดเพลง">♪</button>
-          <input id="volume" type="range" min="-45" max="-6" value="-22" oninput="setVolume(this.value)" class="w-20 accent-indigo-600" title="เพิ่ม/ลดเสียงเพลง" />
+        <div>
+          <b class="text-base sm:text-lg tracking-wide block">Conversation Starter</b>
+          <span class="text-[10px] sm:text-xs opacity-75 font-medium -mt-1 block theme-text">เกมแลกเปลี่ยนมุมมอง</span>
         </div>
-        <button onclick="cycleTheme()" id="theme" class="panel border border-c rounded-xl px-3 py-2 text-xs font-bold muted">Pure</button>
-        <div class="hidden sm:block text-right border-l border-c pl-3"><div class="text-[10px] muted">ตอบแล้ว</div><b id="count" class="accent text-lg">0</b></div>
+      </div>
+
+      <!-- Controls Group -->
+      <div class="flex items-center flex-wrap gap-2.5 sm:gap-3">
+        <!-- Language Switcher -->
+        <div class="glass-panel rounded-xl p-1 text-xs font-semibold flex items-center gap-0.5 border border-c">
+          <button id="l-th" onclick="setLang('th'); sfxClick()" class="px-2.5 py-1.5 rounded-lg font-bold transition-all duration-200 bg-white text-indigo-700 shadow-sm border border-slate-100">TH</button>
+          <button id="l-en" onclick="setLang('en'); sfxClick()" class="px-2.5 py-1.5 rounded-lg muted hover:text-indigo-700 transition-all duration-200">EN</button>
+          <button id="l-bi" onclick="setLang('bi'); sfxClick()" class="px-2.5 py-1.5 rounded-lg muted hover:text-indigo-700 transition-all duration-200">BOTH</button>
+        </div>
+
+        <!-- Ambient sound toggle & slider -->
+        <div class="glass-panel rounded-xl px-2.5 py-1 flex items-center gap-2 border border-c">
+          <button onclick="toggleMusic()" id="music" class="rounded-xl w-8 h-8 flex items-center justify-center font-bold text-slate-700 dark:text-slate-200 hover:bg-black/5 dark:hover:bg-white/5 transition-all" title="เปิด/ปิดเพลงและเสียงประกอบ">
+            <!-- Audio Speaker Muted Icon -->
+            <svg id="speaker-icon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+              <line x1="23" y1="9" x2="17" y2="15"></line>
+              <line x1="17" y1="9" x2="23" y2="15"></line>
+            </svg>
+          </button>
+          <input id="volume" type="range" min="-45" max="-6" value="-22" oninput="setVolume(this.value)" class="w-14 sm:w-20 accent-indigo-600 h-1.5 bg-slate-300 rounded-lg cursor-pointer" title="เพิ่ม/ลดระดับเสียง" />
+        </div>
+
+        <!-- Theme toggle -->
+        <button onclick="cycleTheme(); sfxClick()" id="theme" class="glass-btn rounded-xl px-3 py-2 text-xs font-bold font-mono tracking-wide">
+          Pure
+        </button>
+
+        <!-- Question Counter -->
+        <div class="hidden md:flex flex-col items-end border-l border-c pl-4">
+          <span class="text-[10px] opacity-75 uppercase tracking-wider font-semibold">ตอบแล้ว</span>
+          <b id="count" class="text-xl leading-none text-indigo-600 dark:text-indigo-400 font-bold mt-0.5">0</b>
+        </div>
       </div>
     </div>
   </header>
 
-  <main class="max-w-5xl w-full mx-auto p-4 sm:p-6 flex-1 grid place-items-center">
-    <section id="setup" class="w-full pop">
-      <div class="panel border border-c rounded-3xl shadow-md p-5 sm:p-8">
-        <div class="text-center mb-6"><h1 class="text-2xl sm:text-3xl font-bold accent">เลือกหัวข้อบทสนทนา / Choose Categories</h1><p class="muted mt-2">เลือกหมวดคำถามเพื่อเริ่มกิจกรรมทำความรู้จัก ฝึกภาษา และแบ่งปันความเชื่อ</p></div>
-        <div id="cats" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
-        <div class="mt-6 pt-5 border-t border-c flex flex-col sm:flex-row justify-between gap-3">
-          <div><button onclick="setAll(true)" class="px-3 py-2 text-sm muted font-bold">เลือกทั้งหมด</button><button onclick="setAll(false)" class="px-3 py-2 text-sm muted font-bold">เอาออกทั้งหมด</button></div>
-          <button onclick="start()" class="grad rounded-2xl px-8 py-3 font-bold shadow-md">เริ่มการสนทนา / Start Session</button>
+  <!-- Main Content Layout -->
+  <main class="max-w-6xl w-full mx-auto px-4 py-6 sm:py-8 md:py-12 flex-1 flex flex-col justify-center items-center">
+    
+    <!-- SECTION 1: Setup Screen -->
+    <section id="setup" class="w-full max-w-4xl pop">
+      <div class="glass-panel rounded-3xl p-6 sm:p-8 md:p-10 shadow-xl border border-white/20">
+        <div class="text-center mb-8 max-w-2xl mx-auto">
+          <h1 class="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight bg-gradient-to-r from-indigo-700 to-violet-700 bg-clip-text text-transparent">
+            เลือกหัวข้อบทสนทนา / Choose Categories
+          </h1>
+          <p class="text-sm sm:text-base mt-3 theme-text">
+            เลือกหมวดหมู่คำถามด้านล่างเพื่อเริ่มกิจกรรมทำความรู้จัก ละลายพฤติกรรม เรียนรู้มุมมองชีวิต และแบ่งปันพระธรรมความเชื่อร่วมกันอย่างสร้างสรรค์
+          </p>
+        </div>
+
+        <!-- Adaptive Grid for Categories (1 col on mobile, 2 col on tablet, 3 col on laptop) -->
+        <div id="cats" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+          <!-- Populated by JavaScript -->
+        </div>
+
+        <div class="mt-8 pt-6 border-t border-c/50 flex flex-col sm:flex-row justify-between items-center gap-4">
+          <div class="flex gap-2">
+            <button onclick="setAll(true); sfxClick()" class="px-4 py-2 text-xs sm:text-sm font-bold glass-btn rounded-xl">เลือกทั้งหมด</button>
+            <button onclick="setAll(false); sfxClick()" class="px-4 py-2 text-xs sm:text-sm font-bold glass-btn rounded-xl">เอาออกทั้งหมด</button>
+          </div>
+          <button onclick="start()" class="w-full sm:w-auto bg-gradient-to-r from-indigo-600 to-indigo-800 hover:from-indigo-700 hover:to-indigo-900 text-white rounded-2xl px-8 py-3.5 font-bold shadow-lg shadow-indigo-600/15 hover:shadow-indigo-600/25 transition-all transform hover:-translate-y-0.5 active:translate-y-0 text-sm sm:text-base">
+            เริ่มการสนทนา / Start Session
+          </button>
         </div>
       </div>
     </section>
 
-    <section id="play" class="hidden w-full pop">
-      <div class="flex items-center justify-between mb-4">
-        <div class="flex gap-2"><button onclick="toggleTimer()" class="panel border border-c rounded-xl px-4 py-2 font-mono font-bold"><span id="timerIcon">▶</span> <span id="timer">00:00</span></button><button onclick="resetTimer()" class="panel border border-c rounded-xl w-11">↻</button></div>
-        <button onclick="end()" class="panel border border-c rounded-xl px-4 py-2 text-sm font-bold muted">จบกิจกรรม / Exit</button>
+    <!-- SECTION 2: Play Screen -->
+    <section id="play" class="hidden w-full max-w-3xl pop">
+      <!-- Toolbar: Timer & Exit Button -->
+      <div class="flex items-center justify-between mb-4 sm:mb-6 gap-3">
+        <div class="flex items-center gap-2">
+          <button onclick="toggleTimer(); sfxClick()" class="glass-btn rounded-2xl px-4 py-2.5 font-mono font-bold flex items-center gap-2 text-sm">
+            <span id="timerIcon" class="text-indigo-600 dark:text-indigo-400">▶</span> 
+            <span id="timer">00:00</span>
+          </button>
+          <button onclick="resetTimer(); sfxClick()" class="glass-btn rounded-2xl w-11 h-11 flex items-center justify-center theme-head" title="รีเซ็ตเวลา">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+              <path d="M3 3v5h5"/>
+            </svg>
+          </button>
+        </div>
+        <button onclick="endSessionPrompt(); sfxClick()" class="glass-btn hover:border-red-400 rounded-2xl px-5 py-2.5 text-xs sm:text-sm font-bold theme-head hover:text-red-600">
+          จบกิจกรรม / Exit
+        </button>
       </div>
-      <div id="card" class="panel border border-c rounded-3xl shadow-lg min-h-[340px] p-6 sm:p-10 text-center flex flex-col justify-between overflow-hidden relative">
-        <div class="absolute top-0 left-0 right-0 h-1.5 alt"><div id="bar" class="grad h-full w-0 transition-all"></div></div>
-        <div id="badge" class="mx-auto mt-2 text-xs font-bold rounded-full px-3 py-1.5 alt muted">Ready</div>
-        <div class="flex-1 grid place-items-center my-6"><div class="w-full"><h2 id="qth" class="accent text-xl sm:text-3xl font-semibold leading-relaxed"></h2><h3 id="qen" class="muted text-lg sm:text-2xl italic leading-relaxed border-t border-c mt-5 pt-5"></h3></div></div>
-        <div class="border-t border-c pt-5 flex justify-between gap-3"><button onclick="copyQ()" class="panel border border-c rounded-xl w-11">⧉</button><div class="flex gap-2"><button id="prev" onclick="prevQ()" class="panel border border-c rounded-xl px-4 py-2 font-bold disabled:opacity-40" disabled>ย้อนกลับ</button><button onclick="nextQ()" class="grad rounded-xl px-5 py-2 font-bold">ถัดไป / Next</button></div></div>
+
+      <!-- 3D Flippable Question Card -->
+      <div class="card-perspective w-full">
+        <div id="card" class="card-3d glass-panel rounded-3xl min-h-[300px] sm:min-h-[340px] md:min-h-[380px] p-6 sm:p-10 text-center flex flex-col justify-between overflow-hidden relative shadow-2xl border border-white/20 select-none cursor-grab active:cursor-grabbing">
+          <!-- Progress bar -->
+          <div class="absolute top-0 left-0 right-0 h-1.5 bg-slate-100/50 dark:bg-slate-800/50">
+            <div id="bar" class="bg-gradient-to-r from-indigo-500 to-violet-500 h-full w-0 transition-all duration-300"></div>
+          </div>
+          
+          <!-- Category Badge -->
+          <div id="badge" class="mx-auto mt-2 text-xs font-bold rounded-full px-4 py-2 glass-panel shadow-sm theme-text">
+            Ready
+          </div>
+
+          <!-- Question Text Area -->
+          <div class="flex-1 grid place-items-center my-6">
+            <div class="w-full">
+              <h2 id="qth" class="text-xl sm:text-2xl md:text-3xl font-bold leading-relaxed theme-head transition-opacity duration-300"></h2>
+              <h3 id="qen" class="text-base sm:text-lg md:text-xl italic font-medium leading-relaxed theme-text border-t border-c/50 mt-5 pt-5 transition-opacity duration-300"></h3>
+            </div>
+          </div>
+
+          <!-- Bottom Action Controls -->
+          <div class="border-t border-slate-200/50 dark:border-slate-700/50 pt-5 flex justify-between items-center gap-3">
+            <button onclick="copyQ(); sfxClick()" class="glass-btn rounded-xl w-11 h-11 flex items-center justify-center hover:scale-105" title="คัดลอกคำถาม">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+              </svg>
+            </button>
+            <div class="flex gap-2.5">
+              <button id="prev" onclick="prevQ()" class="glass-btn rounded-xl px-5 py-2.5 font-bold text-sm disabled:opacity-40 disabled:pointer-events-none flex items-center gap-1.5">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+                </svg>
+                ย้อนกลับ
+              </button>
+              <button onclick="nextQ()" class="bg-gradient-to-r from-indigo-600 to-indigo-800 hover:from-indigo-700 hover:to-indigo-900 text-white rounded-xl px-6 py-2.5 font-bold text-sm shadow-md hover:shadow-indigo-600/10 flex items-center gap-1.5 transition-all">
+                ถัดไป / Next
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="panel border border-c rounded-2xl mt-4 p-4"><button onclick="hist.classList.toggle('hidden')" class="w-full flex justify-between font-bold accent"><span>ประวัติ / History (<span id="hcount">0</span>)</span><span>⌄</span></button><div id="hist" class="hidden mt-3 max-h-48 overflow-auto divide-y border-c"></div></div>
+
+      <!-- History Dropdown (Responsive Width) -->
+      <div class="glass-panel rounded-2xl mt-5 p-4 shadow-md">
+        <button onclick="toggleHistory(); sfxClick()" class="w-full flex justify-between items-center font-bold text-indigo-700 dark:text-indigo-400">
+          <span class="text-sm sm:text-base">ประวัติคำถาม / History (<span id="hcount">0</span>)</span>
+          <svg id="hist-arrow" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 transform transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+        <div id="hist" class="hidden mt-4 max-h-48 overflow-y-auto divide-y divide-slate-200/50 dark:divide-slate-700/50 pr-1"></div>
+      </div>
     </section>
   </main>
 
-  <div id="toast" class="fixed bottom-5 right-5 bg-neutral-900 text-white rounded-xl px-4 py-2 text-sm shadow-lg translate-y-20 opacity-0 transition-all">Copied</div>
 
-<script>
-const categories=[['อุ่นเครื่อง','Warm Up','☕'],['ความทรงจำ','Memories','📷'],['ทัศนคติ','Attitudes','💡'],['สามัคคีธรรมและการรับใช้','Koinonia & Service','🤝'],['พระคัมภีร์และศาสนศาสตร์','Bible & Theology','📖'],['ชีวิตคริสตจักร','Church Life','⛪']];
-const questionDB=[
-{c:1,th:'ในสัปดาห์นี้ มีเรื่องอะไรที่ทำให้คุณรู้สึกยิ้มได้กว้างที่สุดบ้าง?',en:'What made you smile the widest this week?'},{c:1,th:'หากวันนี้คุณสามารถเดินทางวาร์ปไปพักผ่อนที่ไหนก็ได้ในโลก 1 ชั่วโมง คุณจะไปที่ใด?',en:'If you could teleport anywhere for one hour today, where would you go?'},{c:1,th:'อาหารมื้อที่ดีและน่าประทับใจที่สุดที่คุณได้ลิ้มลองในเดือนนี้คืออะไร?',en:'What was the most impressive meal you had this month?'},{c:1,th:'หากจำเป็นต้องเลือกกินอาหารเพียงเมนูเดียวไปตลอดชีวิต คุณจะเลือกอะไร?',en:'If you had to eat one meal forever, what would it be?'},{c:1,th:'กิจกรรมอะไรที่คุณชอบทำเพื่อผ่อนคลายความเครียดมากที่สุดในช่วงนี้?',en:'What activity helps you decompress these days?'},{c:1,th:'หากคุณพูดภาษาเพิ่มได้หนึ่งภาษาอย่างคล่องแคล่ว คุณจะเลือกภาษาใด?',en:'If you could speak one more language fluently, which would you choose?'},
-{c:2,th:'เหตุการณ์ในวัยเด็กช่วงใดที่คุณยังคงจำได้ชัดเจนและอบอุ่นใจที่สุด?',en:'Which childhood event do you remember most vividly and warmly?'},{c:2,th:'ใครคือครูหรือบุคคลต้นแบบที่เป็นแรงบันดาลใจสำคัญให้ชีวิตคุณ?',en:'Who was a teacher or role model who greatly inspired you?'},{c:2,th:'จุดเปลี่ยนครั้งสำคัญใดในชีวิตที่ทำให้คุณเติบโตขึ้น?',en:'What major turning point helped you grow?'},{c:2,th:'คำแนะนำที่ดีที่สุดที่คุณเคยได้รับจากผู้ใหญ่คืออะไร?',en:'What is the best advice you have received from an elder?'},{c:2,th:'บทเพลงใดที่ได้ยินแล้วนึกถึงความทรงจำช่วงวัยเรียน?',en:'Which song brings back memories of school days?'},{c:2,th:'ความสำเร็จหรือความล้มเหลวครั้งใดที่สอนบทเรียนล้ำค่าให้คุณ?',en:'Which success or failure taught you a valuable lesson?'},
-{c:3,th:'ในมุมมองของคุณ ความหมายของความสำเร็จที่แท้จริงคืออะไร?',en:'In your view, what is true success?'},{c:3,th:'คุณค่าที่สำคัญที่สุดที่คุณยึดถือในการดำเนินชีวิตคืออะไร?',en:'What core value do you live by?'},{c:3,th:'หากเปลี่ยนทัศนคติของสังคมได้หนึ่งข้อ คุณอยากเปลี่ยนเรื่องใด?',en:'If you could change one social attitude, what would it be?'},{c:3,th:'คุณจัดการกับความผิดหวังหรือความสูญเสียใหญ่อย่างไร?',en:'How do you cope with major disappointment or loss?'},{c:3,th:'ความแตกต่างระหว่างการใช้ชีวิตเพื่อความสุขและเพื่อความหมายคืออะไร?',en:'What is the difference between living for happiness and meaning?'},{c:3,th:'คุณนิยามผู้นำที่ดีไว้อย่างไร?',en:'How do you define a good leader?'},
-{c:4,th:'เราจะสนับสนุนและพยุงกำลังใจกันได้อย่างจริงจังอย่างไร?',en:'How can we practically support and uplift each other?'},{c:4,th:'จุดแข็งของชุมชนที่เราอยู่ร่วมกันคืออะไร?',en:'What are the strengths of our community?'},{c:4,th:'อุปสรรคสำคัญที่ทำให้คนในชุมชนเข้าใจกันยากคืออะไร?',en:'What is the main barrier to mutual understanding in a community?'},{c:4,th:'ชื่นชมของประทานหรือนิสัยของเพื่อนในวงสนทนานี้หนึ่งคน',en:'Praise a gift or trait of someone in this circle.'},{c:4,th:'คุณมีความสามารถใดที่อยากนำมารับใช้ชุมชนเพิ่มขึ้น?',en:'What skill would you like to use to serve the community?'},{c:4,th:'การต้อนรับเพื่อนใหม่อย่างอบอุ่นควรทำอย่างไร?',en:'How should we warmly welcome newcomers?'},
-{c:5,th:'พระคัมภีร์ข้อใดที่คุณยึดมั่นในการดำเนินชีวิตทางความเชื่อ?',en:'Which Scripture verse do you hold onto in your walk of faith?'},{c:5,th:'ตัวละครในพระคัมภีร์คนใดที่ชีวิตหรือการดิ้นรนใกล้เคียงกับคุณ?',en:'Which biblical character resonates most with your life or struggles?'},{c:5,th:'หากย้อนเวลาไปเห็นเหตุการณ์ในพระคัมภีร์ได้ คุณอยากเห็นเหตุการณ์ใด?',en:'Which biblical event would you want to witness firsthand?'},{c:5,th:'พระธรรมเล่มใดที่คุณชอบอ่านซ้ำและค้นคว้าบ่อยที่สุด เพราะอะไร?',en:'Which Bible book do you study most often, and why?'},{c:5,th:'คำอุปมาของพระเยซูเรื่องใดที่เข้าใจง่ายแต่ทรงพลังที่สุด?',en:'Which parable of Jesus feels simple yet powerful to you?'},{c:5,th:'พระธรรมตอนใดที่อยากศึกษาบริบทวัฒนธรรมและภาษาดั้งเดิมเพิ่มเติม?',en:'Which passage would you like to study in cultural and original-language context?'},
-{c:6,th:'ความประทับใจแรกเมื่อคุณก้าวเข้ามาในคริสตจักรคืออะไร?',en:'What was your first impression when you stepped into church?'},{c:6,th:'ส่วนใดของการนมัสการวันอาทิตย์ที่คุณเชื่อมโยงได้ดีที่สุด?',en:'Which part of Sunday worship connects with you most?'},{c:6,th:'บทเพลงนมัสการใดที่นำคุณซาบซึ้งในความรักของพระเจ้า?',en:'Which worship song moves you with God’s love?'},{c:6,th:'กิจกรรมสามัคคีธรรมแบบใดที่คุณรู้สึกผ่อนคลายและสร้างสรรค์ที่สุด?',en:'What fellowship activity feels most relaxing and creative?'},{c:6,th:'หากเริ่มพันธกิจใหม่ในคริสตจักรได้ คุณอยากเริ่มแนวใด?',en:'If you could launch a new church ministry, what would it be?'},{c:6,th:'ประสบการณ์รับใช้ครั้งแรกในคริสตจักรของคุณคืออะไร?',en:'What was your first experience serving in church?'}];
-let lang='th',pool=[],history=[],idx=-1,total=0,sec=0,timer=null,running=false,theme=0,music=false,synth=null,loop=null,volumeNode=null,filterNode=null,reverbNode=null;
-cats.innerHTML=categories.map((x,i)=>`<label class="cursor-pointer"><input class="category sr-only" id="cat${i+1}" type="checkbox" checked><div class="panel border-2 border-c rounded-2xl p-4 h-full flex gap-3 transition-all"><div class="text-2xl">${x[2]}</div><div class="flex-1"><b class="accent">${x[0]} / ${x[1]}</b><p class="muted text-sm mt-1">คำถามสำหรับเปิดใจและแบ่งปันอย่างเป็นธรรมชาติ</p></div><b class="tick hidden accent">✓</b></div></label>`).join('');
-function setAll(v){for(let i=1;i<=6;i++)document.getElementById('cat'+i).checked=v}function setLang(l){lang=l;['th','en','bi'].forEach(x=>{let b=document.getElementById('l-'+x);b.className='px-2 py-1 rounded-lg '+(x==l?'panel accent':'muted')});if(idx>-1)show(history[idx])}
-function start(){let sel=[1,2,3,4,5,6].filter(i=>document.getElementById('cat'+i).checked);if(!sel.length)return alert('กรุณาเลือกหมวดหมู่อย่างน้อย 1 รายการ');pool=questionDB.filter(q=>sel.includes(q.c)).sort(()=>Math.random()-.5);history=[];idx=-1;total=pool.length;setup.classList.add('hidden');play.classList.remove('hidden');nextQ()}
-function end(){play.classList.add('hidden');setup.classList.remove('hidden');resetTimer()}function nextQ(){if(idx<history.length-1){idx++;return show(history[idx])}if(!pool.length)return alert('คำถามหมดแล้ว สามารถเริ่มรอบใหม่ได้');let q=pool.pop();history.push(q);idx=history.length-1;show(q);renderHist()}function prevQ(){if(idx>0){idx--;show(history[idx])}}
-function show(q){let cat=categories[q.c-1];badge.textContent=cat[0]+' / '+cat[1];qth.textContent=q.th;qen.textContent=q.en;qth.classList.toggle('hidden',lang==='en');qen.classList.toggle('hidden',lang==='th');card.classList.remove('pop');void card.offsetWidth;card.classList.add('pop');bar.style.width=(history.length/total*100)+'%';prev.disabled=idx<=0;count.textContent=hcount.textContent=history.length;resetTimer();toggleTimer()}
-function renderHist(){hist.innerHTML=history.slice().reverse().map(q=>`<div class="py-2 text-sm"><b class="accent">${categories[q.c-1][0]}</b><p>${q.th}</p><p class="muted italic">${q.en}</p></div>`).join('')}function copyQ(){let q=history[idx];if(!q)return;let t=lang==='th'?q.th:lang==='en'?q.en:q.th+'\n'+q.en;navigator.clipboard?.writeText(t).then(()=>toastMsg('คัดลอกแล้ว / Copied'))}
-function toastMsg(t){toast.textContent=t;toast.classList.remove('translate-y-20','opacity-0');setTimeout(()=>toast.classList.add('translate-y-20','opacity-0'),1800)}function fmt(s){return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')}function toggleTimer(){if(running){clearInterval(timer);running=false;timerIcon.textContent='▶'}else{running=true;timerIcon.textContent='Ⅱ';timer=setInterval(()=>{sec++;document.getElementById('timer').textContent=fmt(sec)},1000)}}function resetTimer(){clearInterval(timer);running=false;sec=0;document.getElementById('timer').textContent='00:00';timerIcon.textContent='▶'}
-function cycleTheme(){theme=(theme+1)%4;app.dataset.theme=theme;document.getElementById('theme').textContent=['Pure','Warm','Friendly','Deep'][theme];if(music)playMusic()}function setVolume(v){if(volumeNode)volumeNode.volume.value=parseFloat(v)}async function toggleMusic(){if(!music){await Tone.start();music=true;document.getElementById('music').classList.add('alt');playMusic()}else{music=false;document.getElementById('music').classList.remove('alt');if(loop)loop.stop();if(synth)synth.releaseAll()}}function playMusic(){if(loop){loop.stop();loop.dispose();loop=null}if(synth){synth.releaseAll();synth.dispose();synth=null}if(!volumeNode){volumeNode=new Tone.Volume(parseFloat(document.getElementById('volume').value));reverbNode=new Tone.Reverb({decay:8,wet:.65});filterNode=new Tone.Filter(420,'lowpass');volumeNode.toDestination()}let profiles=[{osc:'sine',freq:460,attack:4,release:6,chords:[[['C3','G3','B3','D4'],['F3','C4','E4','A4'],['A2','E3','G3','C4'],['G2','D3','F3','B3']]],tempo:'4m'},{osc:'triangle',freq:340,attack:3,release:5,chords:[[['D3','A3','C#4','E4'],['G3','D4','F#4','B4'],['B2','F#3','A3','D4'],['A2','E3','G3','C#4']]],tempo:'4m'},{osc:'triangle',freq:540,attack:2,release:4,chords:[[['F3','A3','C4','G4'],['G3','B3','D4','A4'],['E3','G3','B3','D4'],['A2','C3','E3','G3']]],tempo:'2m'},{osc:'sine',freq:260,attack:6,release:8,chords:[[['A2','E3','G3','C4'],['E2','B2','D3','G3'],['D2','A2','C3','F3'],['F2','C3','E3','B3']]],tempo:'4m'}][theme];filterNode.frequency.rampTo(profiles.freq,.4);synth=new Tone.PolySynth(Tone.Synth,{oscillator:{type:profiles.osc},envelope:{attack:profiles.attack,decay:1,sustain:.85,release:profiles.release}}).chain(filterNode,reverbNode,volumeNode);Tone.Transport.bpm.value=theme===2?72:60;Tone.Transport.start();let sets=profiles.chords[0],i=0;loop=new Tone.Loop(t=>{synth.triggerAttackRelease(sets[i++%sets.length],'3m',t,.45)},profiles.tempo).start(0)}
-</script>
+  <!-- Toast Notification -->
+  <div id="toast" class="fixed bottom-6 right-6 bg-slate-900/90 dark:bg-slate-100/95 text-white dark:text-slate-900 rounded-xl px-5 py-3 text-sm shadow-xl translate-y-28 opacity-0 transition-all duration-300 z-50 font-bold flex items-center gap-2">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-400 dark:text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+    </svg>
+    <span id="toastText">Copied</span>
+  </div>
+
+  <script>
+    const categories = [
+      ['อุ่นเครื่อง', 'Warm Up', '☕', 'คำถามเบาสมอง สบายๆ สำหรับละลายพฤติกรรม'],
+      ['ความทรงจำ', 'Memories', '📷', 'ย้อนวันวาน ทบทวนความทรงจำอันอบอุ่นและมีคุณค่า'],
+      ['ทัศนคติ', 'Attitudes', '💡', 'แลกเปลี่ยนทัศนคติ ปรัชญาชีวิต และมุมมองความคิด'],
+      ['สามัคคีธรรมและการรับใช้', 'Koinonia & Service', '🤝', 'สร้างสายสัมพันธ์ เรียนรู้ที่จะสนับสนุนและช่วยเหลือกัน'],
+      ['พระคัมภีร์และศาสนศาสตร์', 'Bible & Theology', '📖', 'ค้นคว้าความจริงจากพระคัมภีร์ และหลักศาสนศาสตร์ลึกซึ้ง'],
+      ['ชีวิตคริสตจักร', 'Church Life', '⛪', 'แบ่งปันประสบการณ์ ความผูกพัน และชีวิตในคริสตจักร']
+    ];
+
+    const questionDB = [
+      // ☕ 1. อุ่นเครื่อง (34 ข้อ)
+      {c:1, th:"ถ้าต้องกินอาหารอย่างเดียวไปตลอดชีวิต จะเลือกอะไร?", en:"If you had to eat only one food for the rest of your life, what would it be?"},
+      {c:1, th:"เช้าวันเสาร์ที่ไม่มีงาน ชอบทำอะไร?", en:"What do you like to do on a free Saturday morning?"},
+      {c:1, th:"ชอบฤดูไหนที่สุด ทำไมถึงชอบ?", en:"Which season do you like the most, and why?"},
+      {c:1, th:"ถ้าเกิดมาเป็นสัตว์ได้ คิดว่าตัวเองเหมือนสัตว์อะไร?", en:"If you could be born as an animal, which one do you think you would be?"},
+      {c:1, th:"ไปร้านกาแฟทีไร สั่งอะไรประจำ?", en:"Whenever you go to a coffee shop, what is your go-to order?"},
+      {c:1, th:"ชอบอ่านหนังสือแบบเล่ม หรือฟัง Audiobook มากกว่ากัน?", en:"Do you prefer reading physical books or listening to audiobooks?"},
+      {c:1, th:"เดือนที่ผ่านมาฟังเพลงอะไรบ่อยที่สุด?", en:"What song did you listen to the most in the past month?"},
+      {c:1, th:"ถ้าเลือกพลังวิเศษได้หนึ่งอย่าง อยากได้อะไร?", en:"If you could choose one superpower, what would it be?"},
+      {c:1, th:"ตื่นเช้าหรือนอนดึกมากกว่ากัน?", en:"Are you more of an early bird or a night owl?"},
+      {c:1, th:"ไอศกรีมรสไหนที่บ่งบอกความเป็นตัวเองได้ดีที่สุด?", en:"Which ice cream flavor represents you the best?"},
+      {c:1, th:"ตอนนี้อยากไปเที่ยวเมืองหรือประเทศไหนมากที่สุด?", en:"Which city or country do you want to visit the most right now?"},
+      {c:1, th:"งานบ้านประเภทไหนที่ทำแล้วรู้สึกเพลิน?", en:"Which chore do you actually enjoy doing?"},
+      {c:1, th:"ของสะสมที่รักมากที่สุดคืออะไร?", en:"What is your most cherished collectible?"},
+      {c:1, th:"ถ้าย้อนเวลากลับไปดูประวัติศาสตร์ได้ อยากไปดูเหตุการณ์ไหน?", en:"If you could travel back in time, which historical event would you want to witness?"},
+      {c:1, th:"ชอบดูหนังแนวไหนที่สุด?", en:"What genre of movies do you like the most?"},
+      {c:1, th:"ช่วงนี้ใช้สติ๊กเกอร์ไลน์หรืออีโมจิไหนบ่อยที่สุด?", en:"Which LINE sticker or emoji do you use the most lately?"},
+      {c:1, th:"ถ้าวันหนึ่งมี 25 ชั่วโมง จะเอาชั่วโมงที่เพิ่มมาไปทำอะไร?", en:"If a day had 25 hours, what would you do with the extra hour?"},
+      {c:1, th:"ชอบนั่งพาหนะอะไรเดินทางที่สุด?", en:"What is your favorite mode of transportation for traveling?"},
+      {c:1, th:"ผลไม้อะไรที่กินได้ไม่มีเบื่อ?", en:"Which fruit can you eat forever without getting bored?"},
+      {c:1, th:"ถ้าต้องใส่เสื้อสีเดียวทั้งปี จะเลือกสีอะไร?", en:"If you had to wear only one color for an entire year, what would you choose?"},
+      {c:1, th:"ชอบภูเขาหรือทะเลมากกว่ากัน?", en:"Do you prefer mountains or the sea?"},
+      {c:1, th:"กีฬาหรือการออกกำลังกายแบบไหนที่ทำแล้วมีความสุขที่สุด?", en:"Which sport or exercise makes you the happiest?"},
+      {c:1, th:"ของชิ้นล่าสุดที่ซื้อแล้วรู้สึกคุ้มมากคืออะไร?", en:"What is the latest thing you bought that was absolutely worth it?"},
+      {c:1, th:"ชอบดูคอนเสิร์ตในฮอลล์ปิด หรือเทศกาลดนตรีกลางแจ้งมากกว่ากัน?", en:"Do you prefer indoor hall concerts or outdoor music festivals?"},
+      {c:1, th:"ขนมสมัยเด็กอะไรที่เห็นทีไรต้องซื้อทุกที?", en:"Which childhood snack do you buy every time you see it?"},
+      {c:1, th:"ถ้าเรียนรู้ภาษาใหม่ได้ทันทีในคืนเดียว จะเลือกภาษาอะไร?", en:"If you could learn a new language overnight, which one would it be?"},
+      {c:1, th:"สัตว์เลี้ยงในฝันที่อยากเลี้ยงแต่ยังไม่มีโอกาสคืออะไร?", en:"What is your dream pet that you haven't had the chance to raise yet?"},
+      {c:1, th:"ชอบนอนเปิดแอร์กี่องศา?", en:"What is your favorite AC temperature setting for sleeping?"},
+      {c:1, th:"เมนูที่ทำแล้วอร่อยที่สุดคืออะไร?", en:"What is your best signature dish that you cook?"},
+      {c:1, th:"วันหยุดชอบอยู่บ้านหรือออกไปข้างนอกมากกว่ากัน?", en:"Do you prefer staying home or going out on days off?"},
+      {c:1, th:"แอปไหนในมือถือที่เปิดบ่อยที่สุดทุกวัน?", en:"Which app on your phone do you open the most every day?"},
+      {c:1, th:"ถ้าเปลี่ยนชื่อเล่นตัวเองได้ อยากชื่ออะไร?", en:"If you could change your nickname, what would you want to be called?"},
+      {c:1, th:"ชอบดูคลิปสั้นหรือวิดีโอยาวๆ มากกว่ากัน?", en:"Do you prefer short clips or long-form videos?"},
+      {c:1, th:"ชอบเค้กหรือพายมากกว่ากัน?", en:"Do you prefer cake or pie?"},
+
+      // 📷 2. ความทรงจำ (33 ข้อ)
+      {c:2, th:"วีรกรรมในวัยเด็กอะไรที่นึกถึงทีไรก็ยังยิ้มได้?", en:"What childhood mischief always makes you smile when you think about it?"},
+      {c:2, th:"ครูหรืออาจารย์คนไหนที่ส่งผลต่อชีวิตมากที่สุด?", en:"Which teacher or professor had the greatest impact on your life?"},
+      {c:2, th:"สถานที่ท่องเที่ยวตอนเด็กที่ไปกับครอบครัวแล้วมีความสุขมากที่สุดคือที่ไหน?", en:"Where was your happiest family vacation spot when you were a child?"},
+      {c:2, th:"ของเล่นชิ้นโปรดตอนเด็กที่หวงมากที่สุดคืออะไร?", en:"What was your favorite childhood toy that you protected the most?"},
+      {c:2, th:"วันเกิดปีไหนที่ประทับใจและมีความสุขที่สุด?", en:"Which birthday was your most memorable and happiest?"},
+      {c:2, th:"สัตว์เลี้ยงตัวแรกชื่ออะไร แล้วมีความทรงจำด้วยกันยังไงบ้าง?", en:"What was the name of your first pet, and what memories do you share?"},
+      {c:2, th:"ความสำเร็จครั้งแรกที่ภูมิใจตัวเองมากคืออะไร?", en:"What was your very first achievement that made you really proud of yourself?"},
+      {c:2, th:"เพลงในอดีตเพลงไหนที่ได้ยินทีไรก็นึกถึงช่วงเวลาเก่าๆ เลย?", en:"Which old song always brings back nostalgic memories whenever you hear it?"},
+      {c:2, th:"ของขวัญชิ้นแรกที่เก็บเงินซื้อเองในชีวิตคืออะไร?", en:"What was the first gift you saved up money to buy for yourself?"},
+      {c:2, th:"หนังเรื่องแรกที่ไปดูในโรงคืออะไร?", en:"What was the first movie you ever watched in a cinema?"},
+      {c:2, th:"เพื่อนสนิทคนแรกในชีวิต ตอนนี้ยังติดต่อกันอยู่ไหม?", en:"Who was your first best friend, and are you still in touch?"},
+      {c:2, th:"เมนูอาหารฝีมือครอบครัวที่คิดถึงมากที่สุดคืออะไร?", en:"What is your most missed family home-cooked meal?"},
+      {c:2, th:"ช่วงเทศกาลปีไหนที่รู้สึกอบอุ่นหัวใจที่สุด?", en:"Which holiday season in the past felt the most heartwarming?"},
+      {c:2, th:"ตอนเด็กอยากเป็นอะไร แล้วตอนนี้เปลี่ยนไปยังไงบ้าง?", en:"What did you want to be when you grew up, and how has that changed?"},
+      {c:2, th:"มุมไหนในโรงเรียนที่ชอบไปนั่งเล่นมากที่สุด?", en:"Which corner of your school was your favorite spot to hang out?"},
+      {c:2, th:"รูปถ่ายในอัลบั้มเก่าใบไหนที่รักมากที่สุด?", en:"Which photograph in your old album do you cherish the most?"},
+      {c:2, th:"เรื่องโกหกหรือเรื่องตลกในวัยเด็กที่คิดว่าไม่มีใครรู้ แต่จริงๆ ทุกคนรู้อยู่แล้ว มีเรื่องอะไรบ้าง?", en:"What childhood lie or funny secret did you think no one knew, but actually everyone did?"},
+      {c:2, th:"การเดินทางไกลครั้งแรกที่ไม่มีผู้ปกครองไปด้วยคือไปที่ไหน?", en:"Where was your first long trip without your parents?"},
+      {c:2, th:"หนังสือเล่มแรกที่อ่านแล้วรู้สึกรักการอ่านขึ้นมาเลยคือเล่มไหน?", en:"What was the first book you read that made you fall in love with reading?"},
+      {c:2, th:"แผลเป็นในวัยเด็กเกิดจากอุบัติเหตุอะไร?", en:"What childhood accident caused your scar?"},
+      {c:2, th:"ค่ายฤดูร้อนหรือค่ายเยาวชนครั้งไหนที่จำไม่เคยลืม?", en:"Which summer camp or youth camp will you never forget?"},
+      {c:2, th:"คำชมจากใครในอดีตที่ยังเป็นกำลังใจมาจนถึงทุกวันนี้?", en:"What compliment from the past still encourages you today?"},
+      {c:2, th:"งานอดิเรกแรกในชีวิตที่เคยทำจริงจังคืออะไร?", en:"What was the first hobby you ever took seriously?"},
+      {c:2, th:"ช่วงเวลาไหนที่รู้สึกว่าตัวเองโตขึ้นเป็นผู้ใหญ่อย่างก้าวกระโดด?", en:"When did you feel like you made a giant leap into adulthood?"},
+      {c:2, th:"การ์ตูนเช้าวันเสาร์-อาทิตย์เรื่องไหนที่ต้องดูทุกอาทิตย์?", en:"Which Saturday/Sunday morning cartoon did you have to watch every week?"},
+      {c:2, th:"ของขวัญจับฉลากวันปีใหม่ที่เคยได้แล้วแปลกใจหรือประทับใจที่สุดคืออะไร?", en:"What was the most surprising or impressive New Year exchange gift you ever received?"},
+      {c:2, th:"กลิ่นอะไรที่ดมแล้วนึกถึงวัยเด็กได้ชัดเจนที่สุด?", en:"What scent brings back the clearest memories of your childhood?"},
+      {c:2, th:"วิชาไหนตอนเด็กที่ชอบและเรียนได้ดีที่สุด?", en:"Which subject did you like and do best in as a child?"},
+      {c:2, th:"คำสอนประโยคไหนจากผู้ใหญ่ที่ยังจำอยู่และใช้ดำเนินชีวิตอยู่?", en:"What teaching or advice from an elder do you still remember and live by?"},
+      {c:2, th:"คอนเสิร์ตหรือการแสดงสดครั้งแรกที่ได้ไปดูคืออะไร?", en:"What was the first concert or live performance you ever attended?"},
+      {c:2, th:"สิ่งที่กลัวมากๆ ตอนเด็ก แต่ตอนนี้รู้สึกว่าเป็นเรื่องธรรมดาคืออะไร?", en:"What were you terrified of as a child that you now find completely normal?"},
+      {c:2, th:"ความทรงจำเกี่ยวกับบ้านหลังแรกที่เคยอยู่เป็นยังไง?", en:"What are your memories of the very first house you lived in?"},
+      {c:2, th:"เหตุการณ์ยากๆ ในอดีตเรื่องไหนที่ผ่านมาแล้วรู้สึกว่าตัวเองเข้มแข็งขึ้น?", en:"Which difficult event in your past made you feel stronger after getting through it?"},
+
+      // 💡 3. ทัศนคติ (33 ข้อ)
+      {c:3, th:"นิยามของ 'ความสำเร็จ' สำหรับตัวเองตอนนี้คืออะไร?", en:"What is your current definition of 'success'?"},
+      {c:3, th:"คิดว่าอะไรสำคัญที่สุดในการรักษาความสัมพันธ์ระยะยาวให้ยั่งยืน?", en:"What do you think is the most important factor in maintaining a long-term relationship?"},
+      {c:3, th:"วิธีจัดการกับความเครียดหรือความกังวลที่ได้ผลดีที่สุดสำหรับตัวเองคืออะไร?", en:"What is your most effective personal way to manage stress or anxiety?"},
+      {c:3, th:"มองความล้มเหลวยังไง มันให้บทเรียนอะไรกับชีวิตบ้าง?", en:"How do you view failure, and what lessons has it taught you?"},
+      {c:3, th:"ค่านิยมหลักที่ยึดถือและจะไม่ยอมสูญเสียไปคืออะไร?", en:"What core value do you hold onto and refuse to lose?"},
+      {c:3, th:"คิดว่า 'ความสุขที่แท้จริง' เกิดขึ้นได้จากอะไรในชีวิตประจำวัน?", en:"What do you think true happiness stems from in daily life?"},
+      {c:3, th:"เวลาขัดแย้งกับคนอื่น มีวิธีปรับความเข้าใจกันยังไง?", en:"How do you reconcile when you have a conflict with someone?"},
+      {c:3, th:"คิดว่าเทคโนโลยีและโซเชียลมีเดียส่งผลต่อความสัมพันธ์ของคนเรายังไงบ้าง?", en:"How do you think technology and social media affect our relationships?"},
+      {c:3, th:"มีหลักคิดยังไงในการบริหารเวลาและสมดุลชีวิต?", en:"What is your philosophy on time management and life balance?"},
+      {c:3, th:"คำวิจารณ์แบบไหนที่รู้สึกว่ามีประโยชน์ และแบบไหนที่เลือกจะปล่อยผ่าน?", en:"What kind of criticism do you find useful, and what do you choose to ignore?"},
+      {c:3, th:"การให้อภัยสำคัญยังไง และขอบเขตของการให้อภัยควรอยู่ตรงไหน?", en:"How important is forgiveness, and where should its boundaries lie?"},
+      {c:3, th:"อะไรที่คิดว่าเป็นอุปสรรคใหญ่ที่สุดในการพัฒนาตัวเอง?", en:"What do you think is the biggest obstacle to your personal growth?"},
+      {c:3, th:"มองการเปลี่ยนแปลงที่เกิดขึ้นกะทันหันในชีวิตยังไง?", en:"How do you view sudden, unexpected changes in your life?"},
+      {c:3, th:"ในมุมมองของตัวเอง ความรักต้องประกอบด้วยอะไรบ้าง?", en:"In your own view, what elements must love consist of?"},
+      {c:3, th:"คิดว่าบทบาทของผู้ชายและผู้หญิงในสังคมตอนนี้ควรเป็นยังไง?", en:"What do you think the roles of men and women in society should be today?"},
+      {c:3, th:"อะไรที่มองว่าเป็นความกล้าหาญที่แท้จริงในชีวิตประจำวัน?", en:"What do you consider to be true bravery in everyday life?"},
+      {c:3, th:"คิดว่าเงินซื้อความสุขได้จริงไหม แค่ไหน?", en:"Do you think money can buy happiness, and to what extent?"},
+      {c:3, th:"การเป็นผู้ฟังที่ดีในมุมมองของตัวเองต้องมีลักษณะยังไง?", en:"What does being a good listener look like in your opinion?"},
+      {c:3, th:"มีทัศนคติยังไงต่อการขอความช่วยเหลือจากคนอื่นเวลาตกต่ำ?", en:"What is your attitude toward asking others for help in difficult times?"},
+      {c:3, th:"คิดว่าความโดดเดี่ยว (Solitude) ต่างจากความเหงา (Loneliness) ยังไง?", en:"How do you think solitude differs from loneliness?"},
+      {c:3, th:"เป้าหมายสูงสุดในชีวิตที่อยากบรรลุก่อนเกษียณคืออะไร?", en:"What is your ultimate goal to achieve before retirement?"},
+      {c:3, th:"ให้ความสำคัญกับพรสวรรค์หรือความพยายามมากกว่ากัน?", en:"Do you value talent or effort more?"},
+      {c:3, th:"จัดการกับความคาดหวังของสังคมหรือครอบครัวที่กดดันตัวเองยังไง?", en:"How do you deal with social or family expectations that pressure you?"},
+      {c:3, th:"คิดว่าความคิดสร้างสรรค์ส่งผลต่อการดำเนินชีวิตยังไงบ้าง?", en:"How do you think creativity influences your way of living?"},
+      {c:3, th:"ทัศนคติต่อความตายและการจากลาเปลี่ยนไปยังไงเมื่ออายุมากขึ้น?", en:"How has your attitude toward death and goodbyes changed as you grow older?"},
+      {c:3, th:"คิดว่าทำไมคนเราถึงควรเรียนรู้สิ่งใหม่ๆ ไปตลอดชีวิต?", en:"Why do you think people should keep learning new things throughout their lives?"},
+      {c:3, th:"กรองหรือเลือกรับข้อมูลข่าวสารยุคนี้ยังไง?", en:"How do you filter and choose to receive information in this era?"},
+      {c:3, th:"ความซื่อสัตย์ในความสัมพันธ์มีความหมายและขอบเขตยังไงสำหรับตัวเอง?", en:"What does honesty in a relationship mean to you, and what are its boundaries?"},
+      {c:3, th:"มองว่าการหยุดพัก (Rest) มีคุณค่ายังไงในสังคมที่ยกย่องความยุ่งตลอดเวลา?", en:"How do you value taking a rest in a society that praises constant busyness?"},
+      {c:3, th:"มีวิธีสร้างแรงบันดาลใจให้ตัวเองยังไงในวันที่รู้สึกหมดไฟ?", en:"How do you inspire yourself on days when you feel burned out?"},
+      {c:3, th:"คิดว่าความงดงามที่แท้จริงของคนเราวัดจากอะไร?", en:"What do you think true human beauty is measured by?"},
+      {c:3, th:"ถ้าเลือกส่งต่อข้อคิดหนึ่งข้อให้คนรุ่นหลัง จะบอกอะไรกับพวกเขา?", en:"If you could pass on one piece of advice to future generations, what would it be?"},
+      {c:3, th:"คิดว่าการยอมรับความจริง (Acceptance) ต่างจากการยอมจำนน (Resignation) ยังไง?", en:"How does acceptance differ from resignation in your view?"},
+
+      // 🤝 4. สามัคคีธรรมและการรับใช้ (34 ข้อ)
+      {c:4, th:"สำหรับตัวเอง คำว่า 'สามัคคีธรรม' ที่แท้จริงมีบรรยากาศเป็นยังไง?", en:"For you, what does the atmosphere of true 'fellowship' feel like?"},
+      {c:4, th:"ของประทานฝ่ายวิญญาณที่คิดว่าตัวเองได้รับและนำมาใช้เพื่อส่วนรวมได้คืออะไร?", en:"What spiritual gift do you think you have received that can be used for the common good?"},
+      {c:4, th:"ประสบการณ์รับใช้ร่วมกันครั้งไหนที่รู้สึกผูกพันกับพี่น้องในทีมมากที่สุด?", en:"Which shared serving experience made you feel closest to your team members?"},
+      {c:4, th:"เวลาเห็นพี่น้องกำลังเจอความทุกข์ยาก มีวิธีแสดงความห่วงใจยังไง?", en:"When you see a brother or sister suffering, how do you express your care?"},
+      {c:4, th:"รับใช้ในบทบาทไหนแล้วรู้สึกว่าได้รับพลังและมีความชื่นชมยินดีภายในมากที่สุด?", en:"Serving in which role gives you the most energy and inner joy?"},
+      {c:4, th:"มีวิธีสร้างความอบอุ่นและต้อนรับสมาชิกใหม่ที่เพิ่งเข้ามาในกลุ่มยังไง?", en:"How do you warmly welcome new members who just joined your group?"},
+      {c:4, th:"อะไรคืออุปสรรคใหญ่ในการสร้างความเป็นน้ำหนึ่งใจเดียวกันในกลุ่ม?", en:"What is the biggest obstacle to creating unity in a group?"},
+      {c:4, th:"อยากให้กลุ่มสามัคคีธรรมพัฒนาในด้านไหนมากที่สุด?", en:"In which area do you want your fellowship group to grow the most?"},
+      {c:4, th:"เวลาความคิดเห็นไม่ตรงกันในทีมรับใช้ สื่อสารยังไงเพื่อรักษาสันติภาพ?", en:"When opinions differ in a ministry team, how do you communicate to maintain peace?"},
+      {c:4, th:"ภาษาความรักแบบไหนที่อยากให้พี่น้องแสดงออกมาให้มากที่สุด?", en:"What love language do you want your brothers and sisters to show you the most?"},
+      {c:4, th:"ประสบการณ์รับใช้ที่ท้าทายที่สุดที่เคยเจอคืออะไร แล้วผ่านมันมาได้ยังไง?", en:"What was your most challenging serving experience, and how did you get through it?"},
+      {c:4, th:"มีวิธีหนุนใจพี่น้องที่รู้สึกท้อใจหรืออยากวางมือจากการรับใช้ยังไง?", en:"How do you encourage those who feel discouraged or want to step down from serving?"},
+      {c:4, th:"การอธิษฐานเผื่อกันและกันสำคัญยังไงกับการสร้างสายสัมพันธ์ในกลุ่ม?", en:"How important is praying for one another in building relationships in a group?"},
+      {c:4, th:"เคยได้รับความช่วยเหลือจากพี่น้องในเวลาที่ขัดสนบ้างไหม เป็นยังไง?", en:"Have you ever received help from brothers and sisters in a time of need? What was it like?"},
+      {c:4, th:"จะบาลานซ์ระหว่าง 'ความสัมพันธ์ในกลุ่ม' กับ 'เป้าหมายการรับใช้' ยังไง?", en:"How do you balance 'group relationships' with 'serving goals'?"},
+      {c:4, th:"กิจกรรมนอกคริสตจักรแบบไหนที่ช่วยกระชับความสัมพันธ์ของกลุ่มได้ดีที่สุด?", en:"What non-church activity helps strengthen your group's bond the best?"},
+      {c:4, th:"คิดว่าการเป็นผู้นำรับใช้ที่ดีตามแบบของพระคริสต์ (Servant Leadership) คืออะไร?", en:"What do you think true servant leadership in the model of Christ is?"},
+      {c:4, th:"ในฐานะส่วนหนึ่งของชุมชนความเชื่อ มีบทบาทในการดูแลกันและกันยังไง?", en:"As part of a faith community, what is your role in looking after one another?"},
+      {c:4, th:"ประสบการณ์ออกไปประกาศหรือทำพันธกิจร่วมกันครั้งไหนที่ประทับใจมากที่สุด?", en:"Which evangelism or shared mission experience was your most memorable?"},
+      {c:4, th:"คิดว่าการเปิดเผยความอ่อนแอของตัวเองในกลุ่มสามัคคีธรรมมีประโยชน์ยังไง?", en:"What do you think are the benefits of revealing your weaknesses in a fellowship group?"},
+      {c:4, th:"จะสร้างพื้นที่ปลอดภัยในกลุ่มให้ทุกคนพูดความจริงด้วยความรักได้ยังไง?", en:"How can we create a safe space in the group for everyone to speak the truth in love?"},
+      {c:4, th:"รับใช้เบื้องหลัง (ที่ไม่มีใครเห็น) กับรับใช้เบื้องหน้า ให้บทเรียนอะไรบ้าง?", en:"What lessons have serving behind the scenes versus in the forefront taught you?"},
+      {c:4, th:"จัดการกับความเหนื่อยล้าฝ่ายวิญญาณจากการรับใช้ยังไง?", en:"How do you deal with spiritual burnout from serving?"},
+      {c:4, th:"การมาร่วมสามัคคีธรรมสม่ำเสมอส่งผลต่อชีวิตความเชื่อส่วนตัวยังไงบ้าง?", en:"How does attending fellowship regularly affect your personal life of faith?"},
+      {c:4, th:"อยากเห็นกลุ่มมีบทบาทในการช่วยเหลือสังคมรอบข้างยังไง?", en:"How do you want your group to play a role in helping the surrounding society?"},
+      {c:4, th:"อะไรที่ประทับใจมากที่สุดในตัวพี่น้องร่วมรับใช้ที่นั่งอยู่ข้างๆ ตอนนี้?", en:"What impresses you the most about the co-worker sitting next to you right now?"},
+      {c:4, th:"การเรียนรู้ที่จะรับความแตกต่างหลากหลายของคนในทีมรับใช้ให้อะไรบ้าง?", en:"What does learning to accept the diversity of people in a serving team give you?"},
+      {c:4, th:"มีวิธีสร้างแรงจูงใจให้ตัวเองซื่อสัตย์ในการรับใช้แม้ในงานเล็กน้อยที่สุดยังไง?", en:"How do you motivate yourself to be faithful in serving even in the smallest tasks?"},
+      {c:4, th:"คำหนุนใจแบบไหนที่เคยได้รับจากพี่น้องแล้วรู้สึกว่าเติมพลังใจได้ถูกจุด?", en:"What word of encouragement from a brother or sister felt like it re-energized you perfectly?"},
+      {c:4, th:"'การแบ่งเบาภาระของกันและกัน' ทำได้เป็นรูปธรรมยังไงในชีวิตประจำวัน?", en:"How can 'bearing one another's burdens' be done practically in daily life?"},
+      {c:4, th:"การเตรียมตัวและเตรียมใจก่อนมาร่วมรับใช้ด้วยกันสำคัญยังไง?", en:"How important is preparing your heart and mind before serving together?"},
+      {c:4, th:"ชุมชนความเชื่อที่ดีช่วยประคับประคองชีวิตครอบครัวหรือความสัมพันธ์ส่วนตัวยังไง?", en:"How does a good faith community help sustain your family life or personal relationships?"},
+      {c:4, th:"อยากขอบคุณพี่น้องในกลุ่มเรื่องอะไรมากที่สุดในรอบปีที่ผ่านมา?", en:"What do you want to thank the group members for the most over the past year?"},
+      {c:4, th:"จะรักษาความชื่นชมยินดีในกลุ่มยังไงเวลาต้องเจอสถานการณ์ที่กดดัน?", en:"How do you maintain joy in the group when facing high-pressure situations?"},
+
+      // 📖 5. พระคัมภีร์และศาสนศาสตร์ (33 ข้อ)
+      {c:5, th:"พระธรรมเล่มไหนที่ชอบศึกษามากที่สุด ทำไมถึงชอบ?", en:"Which Bible book do you enjoy studying the most, and why?"},
+      {c:5, th:"พระสัญญาแบบไหนในพระคัมภีร์ที่ยึดเหนี่ยวจิตใจได้ดีที่สุดในยามวิกฤต?", en:"Which promise in the Scripture anchors your heart the best in times of crisis?"},
+      {c:5, th:"บุคคลในพระคัมภีร์ (ยกเว้นพระเยซู) คนไหนที่รู้สึกว่าชีวิตเขาให้บทเรียนกับตัวเองมากที่สุด?", en:"Which biblical character (except Jesus) do you feel teaches you the most valuable lessons?"},
+      {c:5, th:"ในการศึกษาและตีความพระคัมภีร์ การเข้าใจบริบทประวัติศาสตร์และวัฒนธรรมสำคัญยังไง?", en:"How important is understanding historical and cultural context in studying and interpreting Scripture?"},
+      {c:5, th:"เข้าใจเรื่อง 'พระคุณ' (Grace) และ 'ความรอด' (Salvation) ยังไง?", en:"How do you understand 'grace' and 'salvation'?"},
+      {c:5, th:"ข้อพระคัมภีร์ไหนที่เป็น 'ข้อพระคัมภีร์ประจำชีวิต' ของตัวเอง?", en:"Which verse is your personal life-verse?"},
+      {c:5, th:"มีมุมมองยังไงต่อปัญหาเรื่องความทุกข์ยากของมนุษย์ (Theodicy) กับความรักของพระเจ้า?", en:"What is your perspective on human suffering (theodicy) in relation to God's love?"},
+      {c:5, th:"อุปมาของพระเยซูตอนไหนที่ท้าทายทัศนคติเดิมของตัวเองมากที่สุด?", en:"Which parable of Jesus challenges your old attitudes the most?"},
+      {c:5, th:"หลักศาสนศาสตร์เรื่อง 'พระตรีเอกภาพ' (Trinity) ส่งผลต่อความเข้าใจเรื่องความสัมพันธ์ยังไง?", en:"How does the theology of the Trinity affect your understanding of relationships?"},
+      {c:5, th:"มีวิธีเฝ้าเดี่ยวและใคร่ครวญพระวจนะยังไงให้เกิดผลในชีวิตประจำวัน?", en:"How do you do your quiet time and meditate on God's Word to bear fruit in daily life?"},
+      {c:5, th:"เวลาเจอข้อพระคัมภีร์ที่เข้าใจยากหรือดูเหมือนขัดแย้งกัน มีกระบวนการหาคำตอบยังไง?", en:"When encountering difficult or seemingly contradictory verses, what is your process for finding answers?"},
+      {c:5, th:"หลักคำสอนเรื่อง 'การทรงเลือก' (Election) กับ 'เสรีภาพในการเลือก' (Free Will) ส่งผลต่อการดำเนินชีวิตยังไง?", en:"How do the doctrines of election and free will affect your way of living?"},
+      {c:5, th:"คำเทศนาบนภูเขาตอนไหนที่ปฏิวัติแนวคิดการดำเนินชีวิตของตัวเองมากที่สุด?", en:"Which part of the Sermon on the Mount revolutionized your lifestyle the most?"},
+      {c:5, th:"ความเข้าใจเรื่อง 'ความชอบธรรมโดยความเชื่อ' (Justification by Faith) เปลี่ยนวิธีที่มองตัวเองยังไง?", en:"How does understanding 'justification by faith' change how you view yourself?"},
+      {c:5, th:"เข้าใจคำว่า 'การแยกบริสุทธิ์' (Sanctification) ว่าเป็นกระบวนการยังไงในชีวิตจริง?", en:"How do you understand 'sanctification' as a process in real life?"},
+      {c:5, th:"พระลักษณะของพระเจ้าด้านไหน (เช่น ความรัก ความสัตย์ซื่อ ความยุติธรรม) ที่สัมผัสได้ลึกซึ้งที่สุด?", en:"Which attribute of God (e.g., love, faithfulness, justice) do you experience most deeply?"},
+      {c:5, th:"เรื่องวิวรณ์และเหตุการณ์สุดท้าย (Eschatology) ส่งผลต่อความหวังและการดำเนินชีวิตตอนนี้ยังไง?", en:"How do revelation and eschatology impact your hope and daily living today?"},
+      {c:5, th:"การศึกษาภาษากรีกหรือภาษาเดิมของพระคัมภีร์สำคัญยังไงในการเข้าใจพระวจนะลึกขึ้น?", en:"How important is studying Greek or original languages in understanding God's Word more deeply?"},
+      {c:5, th:"คำอธิษฐานของพระเยซูในสวนเกทเสมนีให้บทเรียนเรื่องการยอมจำนนต่อพระประสงค์ยังไง?", en:"How does Jesus' prayer in Gethsemane teach you about surrendering to God's will?"},
+      {c:5, th:"มีมุมมองศาสนศาสตร์ยังไงเกี่ยวกับบทบาทของธรรมบัญญัติในยุคพันธสัญญาใหม่?", en:"What is your theological view on the role of the Law in the New Testament era?"},
+      {c:5, th:"สดุดีบทไหนที่ใช้ระบายความรู้สึกและอธิษฐานต่อพระเจ้าบ่อยที่สุด?", en:"Which Psalm do you use most often to pour out your feelings and pray to God?"},
+      {c:5, th:"พันธสัญญาเดิมกับพันธสัญญาใหม่เชื่อมโยงเป็นเรื่องเดียวกันได้ยังไงในความเข้าใจของตัวเอง?", en:"How do the Old and New Testaments connect as one unified story in your understanding?"},
+      {c:5, th:"คำว่า 'ภาพลักษณ์ของพระเจ้า' (Imago Dei) ในมนุษย์ ส่งผลต่อวิธีที่ปฏิบัติต่อคนอื่นยังไง?", en:"How does the concept of 'Imago Dei' (Image of God) in humanity affect how you treat others?"},
+      {c:5, th:"มหาบัญชา (The Great Commission) ท้าทายชีวิตการเป็นสาวกของตัวเองในแง่ไหนบ้าง?", en:"In what ways does the Great Commission challenge your life of discipleship?"},
+      {c:5, th:"ความเข้าใจเรื่อง 'พระกายของพระคริสต์' (Body of Christ) ส่งผลต่อมุมมองที่มีต่อความหลากหลายของของประทานยังไง?", en:"How does understanding the 'Body of Christ' shape your view of diverse spiritual gifts?"},
+      {c:5, th:"การฟื้นคืนพระชนม์ (Resurrection) ของพระเยซูสำคัญเป็นศูนย์กลางต่อความเชื่อของตัวเองยังไง?", en:"How central is the Resurrection of Jesus to your personal faith?"},
+      {c:5, th:"พระธรรมปรีชาญาณ (เช่น สุภาษิต ปัญญาจารย์) ช่วยในการตัดสินใจเรื่องยากๆ ในชีวิตยังไง?", en:"How do the Wisdom books (e.g., Proverbs, Ecclesiastes) help you make tough life decisions?"},
+      {c:5, th:"บทบาทของพระวิญญาณบริสุทธิ์ในการเปิดตาใจเพื่อเข้าใจพระวจนะสำคัญยังไง?", en:"How crucial is the Holy Spirit's role in opening your heart to understand the Word?"},
+      {c:5, th:"นิยามของ 'ความเชื่อ' (Faith) ตามฮีบรู 11 มีความหมายในภาคปฏิบัติสำหรับตัวเองยังไง?", en:"What does the definition of 'faith' in Hebrews 11 mean to you in practical terms?"},
+      {c:5, th:"การศึกษาประวัติศาสตร์คริสตจักรและหลักข้อเชื่อโบราณช่วยปกป้องความเชื่อของเราตอนนี้ยังไง?", en:"How does studying church history and ancient creeds help guard our faith today?"},
+      {c:5, th:"มีหลักการยังไงในการนำพระคัมภีร์ไปใช้กับสถานการณ์ที่ไม่ได้ระบุไว้ตรงๆ?", en:"What principles do you use when applying the Bible to modern situations not explicitly mentioned?"},
+      {c:5, th:"พระธรรมโรมบทไหนที่วางรากฐานทางศาสนศาสตร์ให้แน่นที่สุด?", en:"Which chapter of Romans lays the solid theological foundation for you?"},
+      {c:5, th:"ความดีงามและความสัตย์ซื่อของพระเจ้าในประวัติศาสตร์ชนชาติอิสราเอลหนุนใจเรื่องความสัตย์ซื่อของพระองค์ต่อชีวิตเรายังไง?", en:"How does God's goodness and faithfulness to Israel encourage you about His faithfulness in your life?"},
+
+      // ⛪ 6. ชีวิตคริสตจักร (33 ข้อ)
+      {c:6, th:"วันแรกที่เดินเข้ามาในคริสตจักรแห่งนี้ รู้สึกหรือประทับใจอะไรเป็นอย่างแรก?", en:"What was your very first impression when you walked into this church?"},
+      {c:6, th:"เพลงนมัสการเพลงไหนที่ร้องร่วมกันแล้วสัมผัสถึงการสถิตอยู่ของพระเจ้าได้ลึกที่สุด?", en:"Which worship song sung together makes you experience God's presence most deeply?"},
+      {c:6, th:"คิดว่าเอกลักษณ์หรือจุดเด่นที่งดงามที่สุดของคริสตจักรของเราคืออะไร?", en:"What do you consider to be the most beautiful unique strength of our church?"},
+      {c:6, th:"ผู้นำหรือผู้เลี้ยงดูฝ่ายวิญญาณคนไหนในคริสตจักรที่มีส่วนช่วยให้เติบโตขึ้น?", en:"Which leader or spiritual mentor in the church has helped you grow the most?"},
+      {c:6, th:"พิธีศักดิ์สิทธิ์ (เช่น บัพติศมา, มหาสนิท) มีความหมายฝ่ายวิญญาณต่อตัวเองยังไงเวลาเข้าร่วม?", en:"What spiritual meaning do sacraments (like baptism or Holy Communion) have for you when participating?"},
+      {c:6, th:"อยากเห็นคริสตจักรของเราขับเคลื่อนในพันธกิจด้านไหนเพิ่มเติมในอนาคต?", en:"What new ministries do you want to see our church pursue in the future?"},
+      {c:6, th:"ค่ายคริสตจักรหรือวันฟื้นฟูครั้งไหนที่ประทับใจมากที่สุด?", en:"Which church camp or revival day was your most memorable?"},
+      {c:6, th:"มีวิธีรักษาวินัยฝ่ายวิญญาณและมาร่วมนมัสการสม่ำเสมอยังไง?", en:"How do you maintain spiritual discipline and attend worship services consistently?"},
+      {c:6, th:"คริสตจักรท้องถิ่นช่วยปกป้องชีวิตความเชื่อจากการล่อลวงของโลกนี้ยังไง?", en:"How does the local church help protect your faith from the temptations of this world?"},
+      {c:6, th:"บรรยากาศการเรียนพระคัมภีร์หรือคลาสผู้เชื่อใหม่ในคริสตจักรให้อะไรบ้าง?", en:"What has the atmosphere of Bible studies or new believers' classes in church given you?"},
+      {c:6, th:"คิดว่าอะไรที่ท้าทายในการสื่อสารระหว่างคนต่างรุ่นภายในคริสตจักร?", en:"What do you consider challenging about intergenerational communication within the church?"},
+      {c:6, th:"มีส่วนร่วมสนับสนุนพันธกิจของคริสตจักรผ่านสิบลดและการถวายยังไง?", en:"How do you participate in supporting the church's ministries through tithing and offerings?"},
+      {c:6, th:"เวลาคริสตจักรเจอช่วงการทดลองหรือการเปลี่ยนแปลง ท่าทีของตัวเองเป็นยังไง?", en:"What is your attitude when the church goes through times of trial or transition?"},
+      {c:6, th:"รู้สึกว่าตัวเองเป็นส่วนหนึ่งของครอบครัวคริสตจักรนี้อย่างเต็มตัวเมื่อไหร่?", en:"When did you feel like you truly became a full part of this church family?"},
+      {c:6, th:"การต้อนรับและการดูแลอภิบาลในคริสตจักรตอบสนองความต้องการฝ่ายวิญญาณของตัวเองยังไง?", en:"How does the welcoming and pastoral care in the church meet your spiritual needs?"},
+      {c:6, th:"เคยได้บทเรียนชีวิตสำคัญจากการฟังคำพยานของพี่น้องในคริสตจักรเรื่องไหนบ้าง?", en:"What key life lesson did you learn from listening to a brother or sister's testimony in church?"},
+      {c:6, th:"บทบาทของคริสตจักรในการพัฒนาและสร้างผู้นำรุ่นใหม่สำคัญยังไงในมุมมองของตัวเอง?", en:"How crucial is the church's role in developing and building new leaders in your view?"},
+      {c:6, th:"กิจกรรมพิเศษของคริสตจักรงานไหนที่ชอบมีส่วนร่วมมากที่สุด?", en:"Which special church event do you like participating in the most?"},
+      {c:6, th:"จัดการกับความผิดหวังหรือความบาดหมางที่อาจเกิดขึ้นกับคนในคริสตจักรยังไง เพื่อไม่ให้กระทบความเชื่อ?", en:"How do you deal with disappointment or conflict within the church to protect your faith?"},
+      {c:6, th:"โครงสร้างและการบริหารคริสตจักรที่ดีส่งผลต่อความมั่นคงของสมาชิกยังไง?", en:"How does solid church structure and administration affect members' stability?"},
+      {c:6, th:"มีวิธีชวนเพื่อนหรือคนรู้จักมาลองร่วมบรรยากาศคริสตจักรยังไงให้เป็นธรรมชาติ?", en:"How do you naturally invite friends or acquaintances to experience the church atmosphere?"},
+      {c:6, th:"คริสตจักรของเรามีบทบาทเป็นแสงสว่างและเกลือแก่ชุมชนรอบข้างในด้านไหนบ้างที่เด่นชัด?", en:"In what prominent ways does our church act as light and salt to the surrounding community?"},
+      {c:6, th:"เสียงหัวเราะหรือเหตุการณ์ตลกในคริสตจักรครั้งไหนที่จำไม่เคยลืม?", en:"Which moment of laughter or funny incident in church will you never forget?"},
+      {c:6, th:"ความเข้าใจเรื่องสิทธิหน้าที่และความรับผิดชอบของการเป็นสมาชิกคริสตจักรมีความหมายยังไงต่อตัวเอง?", en:"What does understanding the rights and responsibilities of church membership mean to you?"},
+      {c:6, th:"การร่วมใจอธิษฐานในคืนวันอธิษฐานของคริสตจักรส่งผลต่อพลังฝ่ายวิญญาณของส่วนรวมยังไง?", en:"How does joining together in corporate prayer nights impact our collective spiritual power?"},
+      {c:6, th:"อยากเห็นพื้นที่ทางกายภาพของคริสตจักร (อาคาร ห้องนมัสการ พื้นที่ส่วนกลาง) พัฒนาไปยังไง?", en:"How do you want to see the physical spaces of the church (building, sanctuary, common areas) develop?"},
+      {c:6, th:"คำเทศนาซีรีส์ไหนของคริสตจักรที่ตอบโจทย์และเปลี่ยนแปลงทัศนคติการดำเนินชีวิตของตัวเองมากที่สุด?", en:"Which sermon series from the church met your needs and transformed your lifestyle the most?"},
+      {c:6, th:"การเยี่ยมตามบ้านหรือการอภิบาลส่วนตัวจากศิษยาภิบาลสำคัญต่อชีวิตความเชื่อของตัวเองยังไง?", en:"How important is home visitation or personal pastoral care to your life of faith?"},
+      {c:6, th:"มองอนาคตของคริสตจักรนี้ในอีก 5-10 ปีข้างหน้ายังไง แล้วเห็นตัวเองอยู่ตรงไหนในภาพนั้น?", en:"How do you view the future of this church in 5-10 years, and where do you see yourself in that picture?"},
+      {c:6, th:"อยากทำอะไรเพื่อตอบแทนคริสตจักรที่ดูแลและให้สิ่งดีๆ มาตลอด?", en:"What do you want to do to give back to the church that has cared for and given you so much?"},
+      {c:6, th:"การร่วมมือกันระหว่างคริสตจักรของเรากับคริสตจักรอื่นๆ (Unity of the Global Church) สำคัญยังไง?", en:"How important is cooperation between our church and other churches (unity of the global Church)?"},
+      {c:6, th:"รู้สึกยังไงเวลาเห็นเด็กๆ หรือเยาวชนในคริสตจักรโตขึ้นและเริ่มมีบทบาทในการรับใช้?", en:"How do you feel when you see children or youth in the church grow up and begin to serve?"},
+      {c:6, th:"ถ้าจะนิยามคำว่า 'คริสตจักร' ด้วยคำเดียว คำนั้นสำหรับตัวเองคือคำว่าอะไร?", en:"If you had to define 'church' in just one word, what would that word be?"}
+    ];
+
+    let lang = 'th';
+    let pool = [];
+    let history = [];
+    let idx = -1;
+    let total = 0;
+    
+    // Timer Variables
+    let sec = 0;
+    let timer = null;
+    let running = false;
+    
+    // Theme, Music and Synth Variables
+    let theme = 0;
+    let music = false;
+    let synth = null;
+    let loop = null;
+    let volumeNode = null;
+    let filterNode = null;
+    let reverbNode = null;
+
+    // Statistics Variables
+    let sessionStartTime = 0;
+    let currentQuestionStartTime = 0;
+    let categoryStats = {}; 
+
+    // Render Category Checkboxes adaptively
+    cats.innerHTML = categories.map((x, i) => `
+      <label class="cursor-pointer group">
+        <input class="category sr-only" id="cat${i+1}" type="checkbox" checked onchange="sfxClick()">
+        <div class="glass-panel border-2 border-c/50 rounded-2xl p-5 h-full flex gap-4 transition-all duration-300 hover:scale-[1.01] hover:border-indigo-400 relative">
+          <div class="text-3xl select-none filter drop-shadow">${x[2]}</div>
+          <div class="flex-1">
+            <b class="theme-head block text-base sm:text-md tracking-wide group-hover:text-indigo-600 dark:group-hover:text-indigo-400">${x[0]} <span class="theme-text font-normal opacity-75">/ ${x[1]}</span></b>
+            <p class="theme-text text-xs mt-1.5 leading-relaxed opacity-85">${x[3]}</p>
+          </div>
+          <div class="tick hidden absolute top-4 right-4 w-6 h-6 rounded-full bg-indigo-600 text-white font-bold flex items-center justify-center text-xs shadow-sm">✓</div>
+        </div>
+      </label>
+    `).join('');
+
+    function setAll(v) {
+      for (let i = 1; i <= 6; i++) {
+        document.getElementById('cat' + i).checked = v;
+      }
+    }
+
+    function setLang(l) {
+      lang = l;
+      ['th', 'en', 'bi'].forEach(x => {
+        let b = document.getElementById('l-' + x);
+        if (x === l) {
+          b.className = 'px-2.5 py-1.5 rounded-lg font-bold transition-all duration-200 bg-white text-indigo-700 shadow-sm border border-slate-100 dark:bg-slate-800 dark:text-indigo-400 dark:border-slate-700';
+        } else {
+          b.className = 'px-2.5 py-1.5 rounded-lg muted hover:text-indigo-700 dark:hover:text-indigo-400 transition-all duration-200';
+        }
+      });
+      if (idx > -1) {
+        // Rerender active card
+        show(history[idx]);
+      }
+    }
+
+    // Lazy load or access Master Volume node
+    function getMasterVolume() {
+      if (!volumeNode) {
+        volumeNode = new Tone.Volume(parseFloat(document.getElementById('volume').value));
+        volumeNode.toDestination();
+      }
+      return volumeNode;
+    }
+
+    // Synthesized Sound Effects (SFX) using Tone.js
+    function sfxClick() {
+      if (!music) return;
+      try {
+        const clickSynth = new Tone.Synth({
+          oscillator: { type: 'sine' },
+          envelope: { attack: 0.001, decay: 0.08, sustain: 0, release: 0.08 }
+        }).connect(getMasterVolume());
+        clickSynth.volume.value = -6;
+        clickSynth.triggerAttackRelease('E5', '0.04');
+        setTimeout(() => clickSynth.dispose(), 200);
+      } catch(e) {}
+    }
+
+    function sfxFlip() {
+      if (!music) return;
+      try {
+        const flipSynth = new Tone.Synth({
+          oscillator: { type: 'triangle' },
+          envelope: { attack: 0.02, decay: 0.12, sustain: 0, release: 0.1 }
+        }).connect(getMasterVolume());
+        flipSynth.volume.value = -12;
+        let now = Tone.now();
+        flipSynth.triggerAttackRelease('A5', '0.04', now);
+        flipSynth.triggerAttackRelease('E6', '0.04', now + 0.06);
+        setTimeout(() => flipSynth.dispose(), 400);
+      } catch(e) {}
+    }
+
+    function sfxSuccess() {
+      if (!music) return;
+      try {
+        const poly = new Tone.PolySynth(Tone.Synth, {
+          oscillator: { type: 'sine' },
+          envelope: { attack: 0.08, decay: 0.15, sustain: 0.8, release: 0.8 }
+        }).connect(getMasterVolume());
+        poly.volume.value = -8;
+        let now = Tone.now();
+        poly.triggerAttackRelease(['C5', 'E5', 'G5'], '0.2', now);
+        poly.triggerAttackRelease(['E5', 'G5', 'C6'], '0.2', now + 0.15);
+        poly.triggerAttackRelease(['G5', 'C6', 'E6'], '0.4', now + 0.3);
+        setTimeout(() => poly.dispose(), 2000);
+      } catch(e) {}
+    }
+
+    function triggerConfetti() {
+      try {
+        confetti({
+          particleCount: 120,
+          spread: 80,
+          origin: { y: 0.6 }
+        });
+      } catch(e) {}
+    }
+
+    // Start Chat Session
+    function start() {
+      let sel = [1, 2, 3, 4, 5, 6].filter(i => document.getElementById('cat' + i).checked);
+      if (!sel.length) return alert('กรุณาเลือกหมวดหมู่อย่างน้อย 1 รายการ / Please choose at least 1 category');
+      
+      pool = questionDB.filter(q => sel.includes(q.c)).sort(() => Math.random() - .5);
+      history = [];
+      idx = -1;
+      total = pool.length;
+      
+      // Initialize Session Stats
+      sessionStartTime = Date.now();
+      
+      setup.classList.add('hidden');
+      play.classList.remove('hidden');
+      nextQ();
+    }
+
+    function endSessionPrompt() {
+      if (confirm('ต้องการจะจบกิจกรรมหรือไม่? / Do you want to end the session?')) {
+        endSession();
+      }
+    }
+
+    // End Session
+    function endSession() {
+      play.classList.add('hidden');
+      setup.classList.remove('hidden');
+      resetTimer();
+    }
+
+    // 3D Flip showing of questions
+    function show(q) {
+      sfxFlip();
+      
+      const card = document.getElementById('card');
+      card.classList.add('card-flip-y');
+      
+      // Mid-point swap content
+      setTimeout(() => {
+        let cat = categories[q.c - 1];
+        badge.textContent = cat[2] + ' ' + cat[0] + ' / ' + cat[1];
+        
+        qth.textContent = q.th;
+        qen.textContent = q.en;
+        
+        qth.classList.toggle('hidden', lang === 'en');
+        qen.classList.toggle('hidden', lang === 'th');
+        
+        bar.style.width = (history.length / total * 100) + '%';
+        prev.disabled = idx <= 0;
+        count.textContent = hcount.textContent = history.length;
+        
+        card.classList.remove('card-flip-y');
+      }, 180);
+      
+      resetTimer();
+      toggleTimer();
+    }
+
+    function nextQ() {
+      if (idx < history.length - 1) {
+        idx++;
+        return show(history[idx]);
+      }
+      
+      if (!pool.length) {
+        triggerConfetti();
+        sfxSuccess();
+        alert('คำถามหมดแล้ว! / All questions completed!');
+        endSession();
+        return;
+      }
+      
+      let q = pool.pop();
+      history.push(q);
+      idx = history.length - 1;
+      show(q);
+      renderHist();
+    }
+
+    function prevQ() {
+      if (idx > 0) {
+        idx--;
+        show(history[idx]);
+      }
+    }
+
+    function toggleHistory() {
+      const histDiv = document.getElementById('hist');
+      const arrow = document.getElementById('hist-arrow');
+      histDiv.classList.toggle('hidden');
+      if (histDiv.classList.contains('hidden')) {
+        arrow.style.transform = 'rotate(0deg)';
+      } else {
+        arrow.style.transform = 'rotate(180deg)';
+      }
+    }
+
+    function renderHist() {
+      hist.innerHTML = history.slice().reverse().map(q => `
+        <div class="py-3 text-xs sm:text-sm transition-all hover:bg-slate-100/30 px-1 rounded-lg">
+          <b class="text-indigo-600 dark:text-indigo-400 font-semibold">${categories[q.c-1][2]} ${categories[q.c-1][0]}</b>
+          <p class="text-slate-800 dark:text-slate-200 mt-1 font-medium leading-relaxed">${q.th}</p>
+          <p class="text-slate-500 dark:text-slate-400 mt-0.5 italic text-xs leading-relaxed">${q.en}</p>
+        </div>
+      `).join('');
+    }
+
+    function copyQ() {
+      let q = history[idx];
+      if (!q) return;
+      let text = lang === 'th' ? q.th : lang === 'en' ? q.en : q.th + '\n' + q.en;
+      navigator.clipboard?.writeText(text).then(() => toastMsg('คัดลอกแล้ว / Copied'));
+    }
+
+    function toastMsg(t) {
+      toastText.textContent = t;
+      toast.classList.remove('translate-y-28', 'opacity-0');
+      setTimeout(() => toast.classList.add('translate-y-28', 'opacity-0'), 1800);
+    }
+
+    function fmt(s) {
+      return String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0');
+    }
+
+    function toggleTimer() {
+      if (running) {
+        clearInterval(timer);
+        running = false;
+        timerIcon.textContent = '▶';
+      } else {
+        running = true;
+        timerIcon.textContent = 'Ⅱ';
+        timer = setInterval(() => {
+          sec++;
+          document.getElementById('timer').textContent = fmt(sec);
+        }, 1000);
+      }
+    }
+
+    function resetTimer() {
+      clearInterval(timer);
+      running = false;
+      sec = 0;
+      document.getElementById('timer').textContent = '00:00';
+      timerIcon.textContent = '▶';
+    }
+
+    // Toggle Themes (Pure, Warm, Friendly, Deep)
+    function cycleTheme() {
+      theme = (theme + 1) % 4;
+      app.dataset.theme = theme;
+      
+      const themeBtn = document.getElementById('theme');
+      const themeNames = ['Pure', 'Warm', 'Friendly', 'Deep'];
+      themeBtn.textContent = themeNames[theme];
+      
+      if (theme === 3) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+      
+      if (music) playMusic();
+    }
+
+    function setVolume(v) {
+      if (volumeNode) {
+        volumeNode.volume.value = parseFloat(v);
+      }
+    }
+
+    async function toggleMusic() {
+      const speaker = document.getElementById('speaker-icon');
+      if (!music) {
+        await Tone.start();
+        music = true;
+        document.getElementById('music').classList.add('bg-indigo-600/10', 'text-indigo-600');
+        
+        // Speaker ON Icon
+        speaker.innerHTML = `
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+          <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+        `;
+        playMusic();
+        sfxClick();
+      } else {
+        music = false;
+        document.getElementById('music').classList.remove('bg-indigo-600/10', 'text-indigo-600');
+        
+        // Speaker OFF Icon
+        speaker.innerHTML = `
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+          <line x1="23" y1="9" x2="17" y2="15"></line>
+          <line x1="17" y1="9" x2="23" y2="15"></line>
+        `;
+        if (loop) loop.stop();
+        if (synth) synth.releaseAll();
+      }
+    }
+
+    function playMusic() {
+      if (loop) {
+        loop.stop();
+        loop.dispose();
+        loop = null;
+      }
+      if (synth) {
+        synth.releaseAll();
+        synth.dispose();
+        synth = null;
+      }
+      
+      if (!volumeNode) {
+        volumeNode = new Tone.Volume(parseFloat(document.getElementById('volume').value));
+        reverbNode = new Tone.Reverb({ decay: 8, wet: 0.65 });
+        filterNode = new Tone.Filter(420, 'lowpass');
+        volumeNode.toDestination();
+      }
+      
+      let profiles = [
+        { osc: 'sine', freq: 460, attack: 4, release: 6, chords: [[['C3', 'G3', 'B3', 'D4'], ['F3', 'C4', 'E4', 'A4'], ['A2', 'E3', 'G3', 'C4'], ['G2', 'D3', 'F3', 'B3']]], tempo: '4m' },
+        { osc: 'triangle', freq: 340, attack: 3, release: 5, chords: [[['D3', 'A3', 'C#4', 'E4'], ['G3', 'D4', 'F#4', 'B4'], ['B2', 'F#3', 'A3', 'D4'], ['A2', 'E3', 'G3', 'C#4']]], tempo: '4m' },
+        { osc: 'triangle', freq: 540, attack: 2, release: 4, chords: [[['F3', 'A3', 'C4', 'G4'], ['G3', 'B3', 'D4', 'A4'], ['E3', 'G3', 'B3', 'D4'], ['A2', 'C3', 'E3', 'G3']]], tempo: '2m' },
+        { osc: 'sine', freq: 260, attack: 6, release: 8, chords: [[['A2', 'E3', 'G3', 'C4'], ['E2', 'B2', 'D3', 'G3'], ['D2', 'A2', 'C3', 'F3'], ['F2', 'C3', 'E3', 'B3']]], tempo: '4m' }
+      ][theme];
+      
+      filterNode.frequency.rampTo(profiles.freq, 0.4);
+      synth = new Tone.PolySynth(Tone.Synth, {
+        oscillator: { type: profiles.osc },
+        envelope: { attack: profiles.attack, decay: 1, sustain: 0.85, release: profiles.release }
+      }).chain(filterNode, reverbNode, volumeNode);
+      
+      Tone.Transport.bpm.value = theme === 2 ? 72 : 60;
+      Tone.Transport.start();
+      
+      let sets = profiles.chords[0], i = 0;
+      loop = new Tone.Loop(t => {
+        synth.triggerAttackRelease(sets[i++ % sets.length], '3m', t, 0.35);
+      }, profiles.tempo).start(0);
+    }
+
+    // Touch Swipe Gestures
+    let touchStartX = 0;
+    let touchEndX = 0;
+    let touchStartY = 0;
+    let touchEndY = 0;
+
+    const cardElement = document.getElementById('card');
+    
+    cardElement.addEventListener('touchstart', e => {
+      touchStartX = e.changedTouches[0].screenX;
+      touchStartY = e.changedTouches[0].screenY;
+    }, { passive: true });
+
+    cardElement.addEventListener('touchend', e => {
+      touchEndX = e.changedTouches[0].screenX;
+      touchEndY = e.changedTouches[0].screenY;
+      handleSwipe();
+    }, { passive: true });
+
+    function handleSwipe() {
+      let diffX = touchEndX - touchStartX;
+      let diffY = touchEndY - touchStartY;
+      
+      // Ensure horizontal swipe is dominant and passes threshold of 60px
+      if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 60) {
+        if (diffX < 0) {
+          nextQ(); // Swipe Left -> Next
+        } else {
+          prevQ(); // Swipe Right -> Prev
+        }
+      }
+    }
+
+
+  </script>
 </body>
 </html>
