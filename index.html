@@ -913,27 +913,150 @@
         volumeNode.toDestination();
       }
       
-      let profiles = [
-        { osc: 'sine', freq: 460, attack: 4, release: 6, chords: [[['C3', 'G3', 'B3', 'D4'], ['F3', 'C4', 'E4', 'A4'], ['A2', 'E3', 'G3', 'C4'], ['G2', 'D3', 'F3', 'B3']]], tempo: '4m' },
-        { osc: 'triangle', freq: 340, attack: 3, release: 5, chords: [[['D3', 'A3', 'C#4', 'E4'], ['G3', 'D4', 'F#4', 'B4'], ['B2', 'F#3', 'A3', 'D4'], ['A2', 'E3', 'G3', 'C#4']]], tempo: '4m' },
-        { osc: 'triangle', freq: 540, attack: 2, release: 4, chords: [[['F3', 'A3', 'C4', 'G4'], ['G3', 'B3', 'D4', 'A4'], ['E3', 'G3', 'B3', 'D4'], ['A2', 'C3', 'E3', 'G3']]], tempo: '2m' },
-        { osc: 'sine', freq: 260, attack: 6, release: 8, chords: [[['A2', 'E3', 'G3', 'C4'], ['E2', 'B2', 'D3', 'G3'], ['D2', 'A2', 'C3', 'F3'], ['F2', 'C3', 'E3', 'B3']]], tempo: '4m' },
-        { osc: 'sine', freq: 620, attack: 1.5, release: 3.5, chords: [[['F3', 'A3', 'C4', 'E4'], ['G3', 'B3', 'D4', 'F4'], ['E3', 'G3', 'B3', 'D4'], ['A2', 'C3', 'E3', 'G3']]], tempo: '2m' }
-      ][theme];
-      
-      filterNode.frequency.rampTo(profiles.freq, 0.4);
-      synth = new Tone.PolySynth(Tone.Synth, {
-        oscillator: { type: profiles.osc },
-        envelope: { attack: profiles.attack, decay: 1, sustain: 0.85, release: profiles.release }
-      }).chain(filterNode, reverbNode, volumeNode);
-      
-      Tone.Transport.bpm.value = theme === 4 ? 80 : theme === 2 ? 72 : 60;
-      Tone.Transport.start();
-      
-      let sets = profiles.chords[0], i = 0;
-      loop = new Tone.Loop(t => {
-        synth.triggerAttackRelease(sets[i++ % sets.length], '3m', t, 0.35);
-      }, profiles.tempo).start(0);
+      // Assign highly unique musical generation engines per theme for maximal emotional diversity!
+      if (theme === 0) {
+        // --- 0. PURE: Calm Meditative Zen Pad ---
+        // Very slow, soft breathing ambient chord pads using Sine waves.
+        filterNode.frequency.rampTo(420, 0.5);
+        synth = new Tone.PolySynth(Tone.Synth, {
+          oscillator: { type: 'sine' },
+          envelope: { attack: 4, decay: 1, sustain: 0.8, release: 6 }
+        }).chain(filterNode, reverbNode, volumeNode);
+        
+        Tone.Transport.bpm.value = 52; // Very slow, meditative
+        Tone.Transport.start();
+        
+        const chords = [
+          ['C3', 'G3', 'B3', 'D4'],
+          ['F3', 'C4', 'E4', 'A4'],
+          ['A2', 'E3', 'G3', 'C4'],
+          ['G2', 'D3', 'F3', 'B3']
+        ];
+        let i = 0;
+        loop = new Tone.Loop(t => {
+          synth.triggerAttackRelease(chords[i++ % chords.length], '6s', t, 0.35);
+        }, '4m').start(0);
+        
+      } else if (theme === 1) {
+        // --- 1. WARM: Cozy Fingerpicked Acoustic Plucks ---
+        // Warm Triangle plucks with instant attack and fast decay, playing a lovely arpeggiated fingerstyle.
+        filterNode.frequency.rampTo(650, 0.5);
+        synth = new Tone.PolySynth(Tone.Synth, {
+          oscillator: { type: 'triangle' },
+          envelope: { attack: 0.008, decay: 0.8, sustain: 0.4, release: 1.2 }
+        }).chain(filterNode, reverbNode, volumeNode);
+        
+        Tone.Transport.bpm.value = 95; // Warm, organic acoustic tempo
+        Tone.Transport.start();
+        
+        const chords = [
+          ['C3', 'E3', 'G3', 'C4'],
+          ['G2', 'D3', 'G3', 'B3'],
+          ['A2', 'E3', 'A3', 'C4'],
+          ['F2', 'C3', 'F3', 'A3']
+        ];
+        
+        let chordIdx = 0;
+        let step = 0;
+        loop = new Tone.Loop(t => {
+          let chord = chords[chordIdx];
+          let pattern = [0, 2, 1, 3, 2, 3, 1, 2];
+          let noteIndex = pattern[step % pattern.length];
+          let note = chord[noteIndex];
+          
+          synth.triggerAttackRelease(note, '0.4s', t, 0.3);
+          
+          step++;
+          if (step % 8 === 0) {
+            chordIdx = (chordIdx + 1) % chords.length;
+          }
+        }, '8n').start(0);
+        
+      } else if (theme === 2) {
+        // --- 2. FRIENDLY: Upbeat Neo-Soul / Playful E-Piano Pulse ---
+        // Fun, bouncy, syncopated chord pulses like bright rhodes keys.
+        filterNode.frequency.rampTo(750, 0.5);
+        synth = new Tone.PolySynth(Tone.Synth, {
+          oscillator: { type: 'sine' },
+          envelope: { attack: 0.05, decay: 0.6, sustain: 0.6, release: 1.2 }
+        }).chain(filterNode, reverbNode, volumeNode);
+        
+        Tone.Transport.bpm.value = 110; // Active, friendly tempo
+        Tone.Transport.start();
+        
+        const chords = [
+          ['F3', 'A3', 'C4', 'G4'],
+          ['G3', 'B3', 'D4', 'A4'],
+          ['E3', 'G3', 'B3', 'D4'],
+          ['A2', 'C3', 'E3', 'G3']
+        ];
+        
+        let chordIdx = 0;
+        let step = 0;
+        loop = new Tone.Loop(t => {
+          let chord = chords[chordIdx];
+          // Bouncy syncopated heartbeat rhythm: beat 0, beat 1.5, beat 3
+          if (step === 0 || step === 3 || step === 5) {
+            let dur = step === 5 ? '4n' : '8n';
+            synth.triggerAttackRelease(chord, dur, t, 0.32);
+          }
+          
+          step = (step + 1) % 8;
+          if (step === 0) {
+            chordIdx = (chordIdx + 1) % chords.length;
+          }
+        }, '8n').start(0);
+        
+      } else if (theme === 3) {
+        // --- 3. DEEP: Cyber Dark-Synth Cosmic Sweep ---
+        // Vangelis-style heavy, rich, filter-swept Sawtooth chords. Thick, deep, electronic cosmic texture.
+        filterNode.frequency.rampTo(280, 0.5); // Warm, low filter
+        synth = new Tone.PolySynth(Tone.Synth, {
+          oscillator: { type: 'sawtooth' },
+          envelope: { attack: 6, decay: 2, sustain: 0.75, release: 8 }
+        }).chain(filterNode, reverbNode, volumeNode);
+        
+        Tone.Transport.bpm.value = 45; // Very slow space drone
+        Tone.Transport.start();
+        
+        const chords = [
+          ['A2', 'E3', 'G3', 'C4'],
+          ['F2', 'C3', 'F3', 'A3'],
+          ['D2', 'A2', 'C3', 'F3'],
+          ['E2', 'B2', 'D3', 'G3']
+        ];
+        
+        let i = 0;
+        loop = new Tone.Loop(t => {
+          let chord = chords[i++ % chords.length];
+          synth.triggerAttackRelease(chord, '8s', t, 0.28);
+          // Modulate filter frequency for analog sweep illusion
+          filterNode.frequency.setValueAtTime(240, t);
+          filterNode.frequency.exponentialRampToValueAtTime(750, t + 4);
+          filterNode.frequency.exponentialRampToValueAtTime(240, t + 8);
+        }, '4m').start(0);
+        
+      } else if (theme === 4) {
+        // --- 4. FUN: Playful 8-Bit Chiptune / Retro Marimba Bouncer ---
+        // Bubbly, bouncy, rapid major arpeggios using a bright Square wave! High energy and extremely fun!
+        filterNode.frequency.rampTo(1200, 0.5); // Very bright!
+        synth = new Tone.PolySynth(Tone.Synth, {
+          oscillator: { type: 'square' },
+          envelope: { attack: 0.001, decay: 0.15, sustain: 0.1, release: 0.15 }
+        }).chain(filterNode, reverbNode, volumeNode);
+        
+        Tone.Transport.bpm.value = 120; // Fast and energetic!
+        Tone.Transport.start();
+        
+        const scale = ['C4', 'E4', 'G4', 'C5', 'G4', 'E4', 'D4', 'F4', 'A4', 'D5', 'A4', 'F4', 'E4', 'G4', 'B4', 'E5', 'B4', 'G4'];
+        let step = 0;
+        
+        loop = new Tone.Loop(t => {
+          let note = scale[step % scale.length];
+          synth.triggerAttackRelease(note, '16n', t, 0.18);
+          step++;
+        }, '16n').start(0);
+      }
     }
 
     // Touch Swipe Gestures
